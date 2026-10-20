@@ -337,3 +337,18 @@ body {
 .nav-btn.active { color: var(--colombia-yellow); }
 
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+.styled-select {
+    width: 100%;
+    background: #0f172a;
+    border: 1px solid var(--border-color);
+    padding: 10px 14px;
+    border-radius: 10px;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+.styled-select:focus {
+    border-color: var(--colombia-yellow);
+    outline: none;
+}
