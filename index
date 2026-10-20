@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sol Digital Radio</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#FCD116">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="assets/icon-192.png">
+
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Estilos -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Franja de Colores de la Bandera de Colombia (Ribete Superior) -->
+    <div class="colombia-flag-bar">
+        <div class="stripe yellow"></div>
+        <div class="stripe blue"></div>
+        <div class="stripe red"></div>
+    </div>
+
+    <!-- Contenedor Principal -->
+    <div class="app-container">
+        
+        <!-- Cabecera -->
+        <header class="app-header">
+            <div class="brand-info">
+                <h1>Sol Digital Radio</h1>
+                <span class="subtitle">by EPamar &bull; Sol Digital Solutions</span>
+            </div>
+            <div class="server-status-pill" id="serverStatusIndicator" title="Estado del Servidor">
+                <span class="dot"></span> <span id="statusText">Verificando...</span>
+            </div>
+        </header>
+
+        <!-- Notificación Servidor Despertando -->
+        <div id="wakingBanner" class="waking-banner hidden">
+            <i class="fa-solid fa-mug-hot fa-bounce"></i>
+            <div>
+                <strong>Despertando el servidor...</strong>
+                <p>Render está encendiendo el motor del streaming. Esto puede tomar unos segundos.</p>
+            </div>
+        </div>
+
+        <!-- Vistas de la Aplicación -->
+        <main class="main-content">
+            
+            <!-- VISTA 1: REPRODUCTOR -->
+            <section id="playerView" class="view active">
+                <div class="visualizer-card">
+                    <div class="vinyl-container" id="vinylDisc">
+                        <div class="vinyl-grooves"></div>
+                        <div class="vinyl-label">
+                            <i class="fa-solid fa-compact-disc fa-spin-slow"></i>
+                        </div>
+                    </div>
+                    <div class="track-info">
+                        <h2 id="currentTrackTitle">Conectando con la señal...</h2>
+                        <p id="currentTrackArtist">Sol Digital Solutions</p>
+                    </div>
+                </div>
+
+                <div class="player-controls">
+                    <div class="volume-control">
+                        <i class="fa-solid fa-volume-low"></i>
+                        <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.8">
+                        <i class="fa-solid fa-volume-high"></i>
+                    </div>
+                    <button id="playPauseBtn" class="play-btn">
+                        <i class="fa-solid fa-play" id="playIcon"></i>
+                    </button>
+                    <div class="live-badge">
+                        <span class="pulse-dot"></span> EN VIVO
+                    </div>
+                </div>
+            </section>
+
+            <!-- VISTA 2: PANEL DE GESTIÓN -->
+            <section id="adminView" class="view">
+                <div class="admin-card">
+                    <h3><i class="fa-solid fa-sliders"></i> Panel de Gestión del Servidor</h3>
+                    <p class="desc">Configura los parámetros de conexión al relay y revisa métricas en vivo.</p>
+
+                    <div class="form-group">
+                        <label for="inputRelayUrl">URL del Servidor Relay (Render)</label>
+                        <input type="url" id="inputRelayUrl" value="https://xiaozhi-radio-server.onrender.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inputMountPoint">Punto de Montaje / Stream URL</label>
+                        <input type="text" id="inputMountPoint" value="https://xiaozhi-radio-server.onrender.com/stream">
+                    </div>
+
+                    <div class="admin-actions">
+                        <button id="saveConfigBtn" class="btn-primary">
+                            <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios
+                        </button>
+                        <button id="pingServerBtn" class="btn-secondary">
+                            <i class="fa-solid fa-bolt"></i> Testear Conexión
+                        </button>
+                    </div>
+
+                    <div class="server-diagnostics">
+                        <h4>Diagnóstico en Vivo</h4>
+                        <ul class="diagnostic-list">
+                            <li><span>Estado HTTP:</span> <strong id="diagHttp">Desconocido</strong></li>
+                            <li><span>Latencia:</span> <strong id="diagLatency">- ms</strong></li>
+                            <li><span>Clientes Conectados:</span> <strong id="diagListeners">--</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Barra de Navegación Inferior -->
+        <nav class="bottom-nav">
+            <button class="nav-btn active" data-target="playerView">
+                <i class="fa-solid fa-radio"></i>
+                <span>Reproductor</span>
+            </button>
+            <button class="nav-btn" data-target="adminView">
+                <i class="fa-solid fa-gear"></i>
+                <span>Gestión</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <!-- Elemento de Audio Oculto -->
+    <audio id="audioStream" preload="none"></audio>
+
+    <!-- Script Principal -->
+    <script src="app.js"></script>
+</body>
+</html>
