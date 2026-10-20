@@ -87,34 +87,40 @@
             <!-- VISTA 2: PANEL DE GESTIÓN -->
             <section id="adminView" class="view">
                 <div class="admin-card">
-                    <h3><i class="fa-solid fa-sliders"></i> Panel de Gestión del Servidor</h3>
-                    <p class="desc">Configura los parámetros de conexión al relay y revisa métricas en vivo.</p>
+                    <h3><i class="fa-solid fa-sliders"></i> Selector y Gestión de Emisoras</h3>
+                    <p class="desc">Elige la emisora activa o añade nuevas fuentes a tu catálogo.</p>
 
                     <div class="form-group">
-                        <label for="inputRelayUrl">URL del Servidor Relay (Render)</label>
-                        <input type="url" id="inputRelayUrl" value="https://xiaozhi-radio-server.onrender.com">
+                        <label for="stationSelect">Emisora Activa</label>
+                        <select id="stationSelect" class="styled-select">
+                            <!-- Se llena dinámicamente con JavaScript -->
+                        </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="inputMountPoint">Punto de Montaje / Stream URL</label>
-                        <input type="text" id="inputMountPoint" value="https://xiaozhi-radio-server.onrender.com/stream">
+                        <label for="inputStationName">Nombre de la Emisora</label>
+                        <input type="text" id="inputStationName" placeholder="Ej: Sol Digital Salsa">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inputStreamUrl">URL del Stream (Render u otro)</label>
+                        <input type="url" id="inputStreamUrl" placeholder="https://tu-servidor.onrender.com/stream">
                     </div>
 
                     <div class="admin-actions">
-                        <button id="saveConfigBtn" class="btn-primary">
-                            <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios
+                        <button id="addStationBtn" class="btn-primary">
+                            <i class="fa-solid fa-plus"></i> Agregar Emisora
                         </button>
                         <button id="pingServerBtn" class="btn-secondary">
-                            <i class="fa-solid fa-bolt"></i> Testear Conexión
+                            <i class="fa-solid fa-bolt"></i> Testear URL
                         </button>
                     </div>
 
                     <div class="server-diagnostics">
-                        <h4>Diagnóstico en Vivo</h4>
+                        <h4>Diagnóstico del Stream Actual</h4>
                         <ul class="diagnostic-list">
                             <li><span>Estado HTTP:</span> <strong id="diagHttp">Desconocido</strong></li>
                             <li><span>Latencia:</span> <strong id="diagLatency">- ms</strong></li>
-                            <li><span>Clientes Conectados:</span> <strong id="diagListeners">--</strong></li>
                         </ul>
                     </div>
                 </div>
