@@ -1,13 +1,19 @@
 {
-  "name": "Sol Digital Radio",
+  "name": "Sol Digital Radio by EPamar",
   "short_name": "Sol Radio",
-  "start_url": "./index.html",
+  "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#0d1117",
-  "theme_color": "#ffcc00",
+  "background_color": "#0f172a",
+  "theme_color": "#FCD116",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3076/3076897.png",
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
