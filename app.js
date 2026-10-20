@@ -9,14 +9,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const statusText = document.getElementById('statusText');
     const wakingBanner = document.getElementById('wakingBanner');
     
-    // Elementos de Configuración y Diagnóstico
-    const inputRelayUrl = document.getElementById('inputRelayUrl');
-    const inputMountPoint = document.getElementById('inputMountPoint');
-    const saveConfigBtn = document.getElementById('saveConfigBtn');
+    // Elementos de Gestión y Selector
+    const stationSelect = document.getElementById('stationSelect');
+    const inputStationName = document.getElementById('inputStationName');
+    const inputStreamUrl = document.getElementById('inputStreamUrl');
+    const addStationBtn = document.getElementById('addStationBtn');
     const pingServerBtn = document.getElementById('pingServerBtn');
     const diagHttp = document.getElementById('diagHttp');
     const diagLatency = document.getElementById('diagLatency');
-    const diagListeners = document.getElementById('diagListeners');
+    const currentTrackTitle = document.getElementById('currentTrackTitle');
 
     // Navegación entre pestañas
     const navButtons = document.querySelectorAll('.nav-btn');
@@ -33,26 +34,63 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Cargar configuración guardada o por defecto
-    const savedUrl = localStorage.getItem('relay_url') || 'https://xiaozhi-radio-server.onrender.com';
-    const savedMount = localStorage.getItem('mount_point') || 'https://xiaozhi-radio-server.onrender.com/stream';
-    
-    inputRelayUrl.value = savedUrl;
-    inputMountPoint.value = savedMount;
+    // Lista por defecto de Emisoras (puedes agregar más aquí o desde el panel)
+    let stations = JSON.parse(localStorage.getItem('sol_stations')) || [
+        { name: "Sol Digital Radio (Principal)", url: "https://xiaozhi-radio-server.onrender.com/stream" },
+        { name: "Sol Digital Alternativa (Backup)", url: "https://xiaozhi-radio-server.onrender.com/backup" }
+    ];
 
     let isPlaying = false;
-    let checkInterval = null;
 
-    // Guardar configuración
-    saveConfigBtn.addEventListener('click', () => {
-        localStorage.setItem('relay_url', inputRelayUrl.value.trim());
-        localStorage.setItem('mount_point', inputMountPoint.value.trim());
-        alert('¡Configuración guardada con éxito!');
+    // Poblar el selector de emisoras
+    function renderStations() {
+        stationSelect.innerHTML = '';
+        stations.forEach((station, index) => {
+            const option = document.createElement('option');
+            option.value = index;
+            option.textContent = station.name;
+            stationSelect.appendChild(option);
+        });
+    }
+
+    renderStations();
+
+    // Cuando cambias de emisora en el selector
+    stationSelect.addEventListener('change', () => {
+        const selectedStation = stations[stationSelect.value];
+        currentTrackTitle.textContent = selectedStation.name;
+        if (isPlaying) {
+            stopPlayback();
+            startPlayback();
+        } else {
+            checkServerStatus();
+        }
+    });
+
+    // Agregar nueva emisora desde el panel
+    addStationBtn.addEventListener('click', () => {
+        const name = inputStationName.value.trim();
+        const url = inputStreamUrl.value.trim();
+
+        if (!name || !url) {
+            alert('Por favor completa el nombre y la URL de la emisora.');
+            return;
+        }
+
+        stations.push({ name, url });
+        localStorage.setItem('sol_stations', JSON.stringify(stations));
+        renderStations();
+        
+        // Seleccionar la recién creada
+        stationSelect.value = stations.length - 1;
+        inputStationName.value = '';
+        inputStreamUrl.value = '';
+        alert('¡Emisora agregada con éxito!');
         checkServerStatus();
     });
 
     // Control Play / Pause
-    playPauseBtn.addEventListener('click', async () => {
+    playPauseBtn.addEventListener('click', () => {
         if (!isPlaying) {
             startPlayback();
         } else {
@@ -61,9 +99,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function startPlayback() {
-        const streamUrl = inputMountPoint.value.trim();
-        // Añadimos timestamp para evitar caché agresiva en navegadores móviles
-        audioStream.src = `${streamUrl}?t=${Date.now()}`;
+        const currentStation = stations[stationSelect.value];
+        currentTrackTitle.textContent = currentStation.name;
+        
+        // Añadimos timestamp para evitar caché
+        audioStream.src = `${currentStation.url}?t=${Date.now()}`;
         
         wakingBanner.classList.remove('hidden');
         statusText.textContent = 'Conectando...';
@@ -103,9 +143,9 @@ document.addEventListener('DOMContentLoaded', () => {
         audioStream.volume = e.target.value;
     });
 
-    // Testear Estado del Servidor (Render Ping + Waking Detector)
+    // Testear Estado del Servidor
     async function checkServerStatus() {
-        const url = inputRelayUrl.value.trim();
+        const currentStation = stations[stationSelect.value];
         const startTime = Date.now();
         
         serverStatusIndicator.className = 'server-status-pill waking';
@@ -113,22 +153,18 @@ document.addEventListener('DOMContentLoaded', () => {
         wakingBanner.classList.remove('hidden');
 
         try {
-            // Usamos modo 'no-cors' o fetch directo
-            const response = await fetch(url, { method: 'GET', mode: 'no-cors', cache: 'no-store' });
+            await fetch(currentStation.url, { method: 'GET', mode: 'no-cors', cache: 'no-store' });
             const latency = Date.now() - startTime;
 
             diagHttp.textContent = 'Activo (OK)';
             diagLatency.textContent = `${latency} ms`;
-            diagListeners.textContent = '1+ (Activo)';
             
             serverStatusIndicator.className = 'server-status-pill online';
             statusText.textContent = 'Servidor Listo';
             wakingBanner.classList.add('hidden');
         } catch (error) {
-            console.warn("Servidor durmiendo o inactivo:", error);
             diagHttp.textContent = 'Inactivo / Despertando';
             diagLatency.textContent = '> 3000 ms';
-            diagListeners.textContent = '0';
 
             serverStatusIndicator.className = 'server-status-pill waking';
             statusText.textContent = 'Despertando...';
@@ -136,14 +172,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     pingServerBtn.addEventListener('click', checkServerStatus);
-
-    // Verificar al iniciar
     checkServerStatus();
 
-    // Registro de PWA Service Worker
+    // Service Worker
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js')
-            .then(() => console.log('Service Worker registrado correctamente.'))
-            .catch(err => console.log('Error al registrar Service Worker:', err));
+        navigator.serviceWorker.register('sw.js').catch(() => {});
     }
 });
