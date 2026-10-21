@@ -21,7 +21,7 @@
 </head>
 <body>
 
-    <!-- Franja de Colores de la Bandera de Colombia (Ribete Superior) -->
+    <!-- Franja de Colores de la Bandera de Colombia -->
     <div class="colombia-flag-bar">
         <div class="stripe yellow"></div>
         <div class="stripe blue"></div>
@@ -47,14 +47,14 @@
             <i class="fa-solid fa-mug-hot fa-bounce"></i>
             <div>
                 <strong>Despertando el servidor...</strong>
-                <p>Render está encendiendo el motor del streaming. Esto puede tomar unos segundos.</p>
+                <p>Render está encendiendo el motor del streaming.</p>
             </div>
         </div>
 
         <!-- Vistas de la Aplicación -->
         <main class="main-content">
             
-            <!-- VISTA 1: REPRODUCTOR -->
+            <!-- VISTA 1: REPRODUCTOR / ROCOLA -->
             <section id="playerView" class="view active">
                 <div class="visualizer-card">
                     <div class="vinyl-container" id="vinylDisc">
@@ -64,8 +64,16 @@
                         </div>
                     </div>
                     <div class="track-info">
-                        <h2 id="currentTrackTitle">Conectando con la señal...</h2>
-                        <p id="currentTrackArtist">Sol Digital Solutions</p>
+                        <h2 id="currentTrackTitle">Selecciona una emisora</h2>
+                        <p id="currentTrackArtist">Sol Digital Solutions Jukebox</p>
+                    </div>
+                </div>
+
+                <!-- Kiosko de Emisoras (Botones de Rocola en Pantalla Principal) -->
+                <div class="rocola-section">
+                    <h4><i class="fa-solid grid-icon fa-compact-disc"></i> Selecciona tu Disco / Emisora:</h4>
+                    <div id="rocolaStationsGrid" class="rocola-grid">
+                        <!-- Se generan dinámicamente -->
                     </div>
                 </div>
 
@@ -87,13 +95,13 @@
             <!-- VISTA 2: PANEL DE GESTIÓN -->
             <section id="adminView" class="view">
                 <div class="admin-card">
-                    <h3><i class="fa-solid fa-sliders"></i> Selector y Gestión de Emisoras</h3>
-                    <p class="desc">Elige la emisora activa o añade nuevas fuentes a tu catálogo.</p>
+                    <h3><i class="fa-solid fa-sliders"></i> Gestión de Emisoras</h3>
+                    <p class="desc">Añade o elimina frecuencias del catálogo de la rocola.</p>
 
                     <div class="form-group">
                         <label for="stationSelect">Emisora Activa</label>
                         <select id="stationSelect" class="styled-select">
-                            <!-- Se llena dinámicamente con JavaScript -->
+                            <!-- Dinámico -->
                         </select>
                     </div>
 
@@ -103,25 +111,17 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="inputStreamUrl">URL del Stream (Render u otro)</label>
+                        <label for="inputStreamUrl">URL del Stream (HTTPS recomendado)</label>
                         <input type="url" id="inputStreamUrl" placeholder="https://tu-servidor.onrender.com/stream">
                     </div>
 
                     <div class="admin-actions">
                         <button id="addStationBtn" class="btn-primary">
-                            <i class="fa-solid fa-plus"></i> Agregar Emisora
+                            <i class="fa-solid fa-plus"></i> Agregar a la Rocola
                         </button>
                         <button id="pingServerBtn" class="btn-secondary">
                             <i class="fa-solid fa-bolt"></i> Testear URL
                         </button>
-                    </div>
-
-                    <div class="server-diagnostics">
-                        <h4>Diagnóstico del Stream Actual</h4>
-                        <ul class="diagnostic-list">
-                            <li><span>Estado HTTP:</span> <strong id="diagHttp">Desconocido</strong></li>
-                            <li><span>Latencia:</span> <strong id="diagLatency">- ms</strong></li>
-                        </ul>
                     </div>
                 </div>
             </section>
@@ -132,7 +132,7 @@
         <nav class="bottom-nav">
             <button class="nav-btn active" data-target="playerView">
                 <i class="fa-solid fa-radio"></i>
-                <span>Reproductor</span>
+                <span>Rocola</span>
             </button>
             <button class="nav-btn" data-target="adminView">
                 <i class="fa-solid fa-gear"></i>
@@ -142,10 +142,8 @@
 
     </div>
 
-    <!-- Elemento de Audio Oculto -->
+    <!-- Audio Oculto -->
     <audio id="audioStream" preload="none"></audio>
-
-    <!-- Script Principal -->
     <script src="app.js"></script>
 </body>
 </html>
