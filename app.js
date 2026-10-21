@@ -97,10 +97,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    function startPlayback() {
+   function startPlayback() {
         const currentStation = stations[stationSelect.value];
         currentTrackTitle.textContent = currentStation.name;
         
+        // Disparar animación estilo Rocolita (Efecto LP)
+        vinylDisc.classList.remove('jukebox-load');
+        void vinylDisc.offsetWidth; // Forzar reinicio de animación
+        vinylDisc.classList.add('jukebox-load');
+
         audioStream.src = `${currentStation.url}?t=${Date.now()}`;
         
         wakingBanner.classList.remove('hidden');
@@ -124,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
             vinylDisc.classList.remove('playing');
         });
     }
-
+    
     function stopPlayback() {
         audioStream.pause();
         audioStream.src = '';
