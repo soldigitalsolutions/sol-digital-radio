@@ -349,3 +349,51 @@ body {
 .nav-btn.active { color: var(--colombia-yellow); }
 
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+/* Estilos del Kiosko de Emisoras (Rocola Grid) */
+.rocola-section {
+    margin-top: 15px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 12px;
+}
+.rocola-section h4 {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.rocola-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    max-height: 110px;
+    overflow-y: auto;
+}
+.rocola-station-btn {
+    background: #0f172a;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.rocola-station-btn:hover {
+    border-color: var(--colombia-yellow);
+    color: var(--text-primary);
+}
+.rocola-station-btn.active {
+    background: linear-gradient(135deg, var(--colombia-yellow), #eab308);
+    color: #0f172a;
+    font-weight: 600;
+    border-color: transparent;
+    box-shadow: 0 0 10px var(--accent-glow);
+}
