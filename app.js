@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Lista por defecto de Emisoras (puedes agregar más aquí o desde el panel)
+    // Lista por defecto de Emisoras
     let stations = JSON.parse(localStorage.getItem('sol_stations')) || [
         { name: "Sol Digital Radio (Principal)", url: "https://xiaozhi-radio-server.onrender.com/stream" },
         { name: "Sol Digital Alternativa (Backup)", url: "https://xiaozhi-radio-server.onrender.com/backup" }
@@ -81,7 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('sol_stations', JSON.stringify(stations));
         renderStations();
         
-        // Seleccionar la recién creada
         stationSelect.value = stations.length - 1;
         inputStationName.value = '';
         inputStreamUrl.value = '';
@@ -102,7 +101,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentStation = stations[stationSelect.value];
         currentTrackTitle.textContent = currentStation.name;
         
-        // Añadimos timestamp para evitar caché
         audioStream.src = `${currentStation.url}?t=${Date.now()}`;
         
         wakingBanner.classList.remove('hidden');
