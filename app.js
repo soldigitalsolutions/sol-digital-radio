@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Referencias del DOM
     const audioStream = document.getElementById('audioStream');
     const playPauseBtn = document.getElementById('playPauseBtn');
     const playIcon = document.getElementById('playIcon');
@@ -9,17 +8,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const statusText = document.getElementById('statusText');
     const wakingBanner = document.getElementById('wakingBanner');
     
-    // Elementos de Gestión y Selector
     const stationSelect = document.getElementById('stationSelect');
     const inputStationName = document.getElementById('inputStationName');
     const inputStreamUrl = document.getElementById('inputStreamUrl');
     const addStationBtn = document.getElementById('addStationBtn');
     const pingServerBtn = document.getElementById('pingServerBtn');
-    const diagHttp = document.getElementById('diagHttp');
-    const diagLatency = document.getElementById('diagLatency');
     const currentTrackTitle = document.getElementById('currentTrackTitle');
+    const rocolaStationsGrid = document.getElementById('rocolaStationsGrid');
 
-    // Navegación entre pestañas
     const navButtons = document.querySelectorAll('.nav-btn');
     const views = document.querySelectorAll('.view');
 
@@ -27,23 +23,23 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', () => {
             navButtons.forEach(b => b.classList.remove('active'));
             views.forEach(v => v.classList.remove('active'));
-            
             btn.classList.add('active');
             const targetView = document.getElementById(btn.getAttribute('data-target'));
             if (targetView) targetView.classList.add('active');
         });
     });
 
-    // Lista por defecto de Emisoras
     let stations = JSON.parse(localStorage.getItem('sol_stations')) || [
         { name: "Sol Digital Radio (Principal)", url: "https://xiaozhi-radio-server.onrender.com/stream" },
         { name: "Sol Digital Alternativa (Backup)", url: "https://xiaozhi-radio-server.onrender.com/backup" }
     ];
 
+    let activeStationIndex = 0;
     let isPlaying = false;
 
-    // Poblar el selector de emisoras
+    // Renderizar emisoras tanto en el select como en los botones de la Rocola principal
     function renderStations() {
+        // 1. Llenar el select de gestión
         stationSelect.innerHTML = '';
         stations.forEach((station, index) => {
             const option = document.createElement('option');
@@ -51,14 +47,48 @@ document.addEventListener('DOMContentLoaded', () => {
             option.textContent = station.name;
             stationSelect.appendChild(option);
         });
+        stationSelect.value = activeStationIndex;
+
+        // 2. Llenar el Kiosko de botones en la pantalla principal (Rocola)
+        rocolaStationsGrid.innerHTML = '';
+        stations.forEach((station, index) => {
+            const btn = document.createElement('button');
+            btn.className = `rocola-station-btn ${index === activeStationIndex ? 'active' : ''}`;
+            btn.innerHTML = `<i class="fa-solid fa-compact-disc"></i> ${station.name}`;
+            btn.addEventListener('click', () => {
+                activeStationIndex = index;
+                stationSelect.value = index;
+                updateActiveStationUI();
+                if (isPlaying) {
+                    stopPlayback();
+                    startPlayback();
+                } else {
+                    checkServerStatus();
+                }
+            });
+            rocolaStationsGrid.appendChild(btn);
+        });
+    }
+
+    function updateActiveStationUI() {
+        const currentStation = stations[activeStationIndex];
+        currentTrackTitle.textContent = currentStation.name;
+        // Actualizar estado activo en los botones de la rocola
+        const buttons = rocolaStationsGrid.querySelectorAll('.rocola-station-btn');
+        buttons.forEach((b, idx) => {
+            if (idx === activeStationIndex) {
+                b.classList.add('active');
+            } else {
+                b.classList.remove('active');
+            }
+        });
     }
 
     renderStations();
 
-    // Cuando cambias de emisora en el selector
     stationSelect.addEventListener('change', () => {
-        const selectedStation = stations[stationSelect.value];
-        currentTrackTitle.textContent = selectedStation.name;
+        activeStationIndex = parseInt(stationSelect.value);
+        updateActiveStationUI();
         if (isPlaying) {
             stopPlayback();
             startPlayback();
@@ -67,7 +97,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Agregar nueva emisora desde el panel
     addStationBtn.addEventListener('click', () => {
         const name = inputStationName.value.trim();
         const url = inputStreamUrl.value.trim();
@@ -79,16 +108,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         stations.push({ name, url });
         localStorage.setItem('sol_stations', JSON.stringify(stations));
+        activeStationIndex = stations.length - 1;
         renderStations();
+        updateActiveStationUI();
         
-        stationSelect.value = stations.length - 1;
         inputStationName.value = '';
         inputStreamUrl.value = '';
-        alert('¡Emisora agregada con éxito!');
+        alert('¡Emisora agregada a la rocola con éxito!');
         checkServerStatus();
     });
 
-    // Control Play / Pause
     playPauseBtn.addEventListener('click', () => {
         if (!isPlaying) {
             startPlayback();
@@ -97,13 +126,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-   function startPlayback() {
-        const currentStation = stations[stationSelect.value];
+    function startPlayback() {
+        const currentStation = stations[activeStationIndex];
         currentTrackTitle.textContent = currentStation.name;
         
-        // Disparar animación estilo Rocolita (Efecto LP)
+        // Disparar animación de carga de LP (Rocola)
         vinylDisc.classList.remove('jukebox-load');
-        void vinylDisc.offsetWidth; // Forzar reinicio de animación
+        void vinylDisc.offsetWidth;
         vinylDisc.classList.add('jukebox-load');
 
         audioStream.src = `${currentStation.url}?t=${Date.now()}`;
@@ -129,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
             vinylDisc.classList.remove('playing');
         });
     }
-    
+
     function stopPlayback() {
         audioStream.pause();
         audioStream.src = '';
@@ -141,43 +170,35 @@ document.addEventListener('DOMContentLoaded', () => {
         wakingBanner.classList.add('hidden');
     }
 
-    // Control de Volumen
     volumeSlider.addEventListener('input', (e) => {
         audioStream.volume = e.target.value;
     });
 
-    // Testear Estado del Servidor
     async function checkServerStatus() {
-        const currentStation = stations[stationSelect.value];
+        const currentStation = stations[activeStationIndex];
         const startTime = Date.now();
         
         serverStatusIndicator.className = 'server-status-pill waking';
         statusText.textContent = 'Verificando...';
-        wakingBanner.classList.remove('hidden');
+        wakingBanner.classList.add('hidden');
 
         try {
             await fetch(currentStation.url, { method: 'GET', mode: 'no-cors', cache: 'no-store' });
             const latency = Date.now() - startTime;
-
-            diagHttp.textContent = 'Activo (OK)';
-            diagLatency.textContent = `${latency} ms`;
-            
             serverStatusIndicator.className = 'server-status-pill online';
             statusText.textContent = 'Servidor Listo';
             wakingBanner.classList.add('hidden');
         } catch (error) {
-            diagHttp.textContent = 'Inactivo / Despertando';
-            diagLatency.textContent = '> 3000 ms';
-
             serverStatusIndicator.className = 'server-status-pill waking';
             statusText.textContent = 'Despertando...';
         }
     }
 
-    pingServerBtn.addEventListener('click', checkServerStatus);
+    if (pingServerBtn) {
+        pingServerBtn.addEventListener('click', checkServerStatus);
+    }
     checkServerStatus();
 
-    // Service Worker
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js').catch(() => {});
     }
