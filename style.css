@@ -1,19 +1,30 @@
-/* 1. Franja tricolor de Colombia más gruesa y vistosa */
-.colombia-flag-bar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 14px; /* Aumentada de 6px a 14px para que luzca imponente */
-    display: flex;
-    z-index: 1000;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+:root {
+    --bg-color: #0f172a;
+    --card-bg: #1e293b;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    
+    /* Colores Bandera de Colombia */
+    --colombia-yellow: #FCD116;
+    --colombia-blue: #003893;
+    --colombia-red: #CE1126;
+    
+    --accent: var(--colombia-yellow);
+    --accent-glow: rgba(252, 209, 22, 0.3);
+    --border-color: #334155;
 }
 
-/* 2. Fondo estilo Rocolita con notas musicales sutiles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Fondo estilo Rocola con notas musicales sutiles */
 body {
     background-color: var(--bg-color);
-    /* Patrón de fondo con notas musicales sutiles y viñeta oscura */
     background-image: 
         radial-gradient(circle at 50% 30%, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.95) 100%),
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Ctext x='15' y='40' font-size='20' opacity='0.04' fill='%23FCD116'%3E♫%3C/text%3E%3Ctext x='65' y='80' font-size='22' opacity='0.04' fill='%23003893'%3E♩%3C/text%3E%3C/svg%3E");
@@ -25,22 +36,316 @@ body {
     overflow: hidden;
 }
 
-/* 3. Animación de "Rocola": El disco entra como cargando un LP */
-@keyframes jukeboxInsert {
-    0% {
-        transform: translateY(-80px) scale(0.6) rotate(-180deg);
-        opacity: 0;
-    }
-    60% {
-        transform: translateY(10px) scale(1.05) rotate(10deg);
-        opacity: 1;
-    }
-    100% {
-        transform: translateY(0) scale(1) rotate(0deg);
-        opacity: 1;
+/* Franja superior tricolor de Colombia imponente (14px) */
+.colombia-flag-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 14px;
+    display: flex;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+.stripe { height: 100%; flex: 1; }
+.stripe.yellow { background-color: var(--colombia-yellow); flex: 2; }
+.stripe.blue { background-color: var(--colombia-blue); }
+.stripe.red { background-color: var(--colombia-red); }
+
+.app-container {
+    width: 100%;
+    max-width: 480px;
+    height: 100vh;
+    max-height: 900px;
+    background-color: var(--bg-color);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 0 0 30px rgba(0,0,0,0.6);
+    overflow: hidden;
+}
+
+@media(min-width: 481px) {
+    .app-container {
+        border-radius: 24px;
+        border: 1px solid var(--border-color);
+        height: 85vh;
     }
 }
 
+/* Header */
+.app-header {
+    padding: 20px 20px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.brand-info h1 { font-size: 1.25rem; font-weight: 700; color: var(--text-primary); }
+.brand-info .subtitle { font-size: 0.75rem; color: var(--text-secondary); }
+
+.server-status-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--card-bg);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    border: 1px solid var(--border-color);
+}
+.server-status-pill .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--text-secondary);
+}
+.server-status-pill.online .dot { background-color: #22c55e; box-shadow: 0 0 8px #22c55e; }
+.server-status-pill.waking .dot { background-color: var(--colombia-yellow); animation: blink 1s infinite; }
+.server-status-pill.offline .dot { background-color: var(--colombia-red); }
+
+/* Banner Servidor Despertando */
+.waking-banner {
+    background: rgba(252, 209, 22, 0.15);
+    border: 1px solid var(--colombia-yellow);
+    color: #fef08a;
+    margin: 10px 20px;
+    padding: 12px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+}
+.waking-banner.hidden { display: none; }
+.waking-banner i { font-size: 1.4rem; color: var(--colombia-yellow); }
+.waking-banner p { font-size: 0.75rem; color: #cbd5e1; margin-top: 2px; }
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    position: relative;
+    overflow-y: auto;
+    padding: 10px 20px;
+}
+.view {
+    display: none;
+    flex-direction: column;
+    height: 100%;
+}
+.view.active { display: flex; }
+
+/* Reproductor Visual & Animación de Rocola (LP) */
+.visualizer-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    margin-top: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+@keyframes jukeboxInsert {
+    0% { transform: translateY(-80px) scale(0.6) rotate(-180deg); opacity: 0; }
+    60% { transform: translateY(10px) scale(1.05) rotate(10deg); opacity: 1; }
+    100% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
+}
+
+.vinyl-container {
+    width: 180px;
+    height: 180px;
+    background: #000;
+    border-radius: 50%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 10px rgba(255,255,255,0.1);
+    border: 4px solid #1e293b;
+    margin-bottom: 25px;
+}
 .vinyl-container.jukebox-load {
     animation: jukeboxInsert 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
+.vinyl-grooves {
+    position: absolute;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 1px dashed rgba(255,255,255,0.15);
+}
+.vinyl-label {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--colombia-yellow), var(--colombia-red));
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #000;
+    font-size: 1.2rem;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+.fa-spin-slow {
+    animation: spin 6s linear infinite;
+    animation-play-state: paused;
+}
+.vinyl-container.playing .fa-spin-slow {
+    animation-play-state: running;
+}
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+.track-info h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 6px; }
+.track-info p { font-size: 0.85rem; color: var(--text-secondary); }
+
+/* Controles de Reproducción */
+.player-controls {
+    margin-top: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+.play-btn {
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--colombia-yellow), #eab308);
+    border: none;
+    color: #0f172a;
+    font-size: 1.8rem;
+    cursor: pointer;
+    box-shadow: 0 0 20px var(--accent-glow);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.play-btn:active { transform: scale(0.95); }
+
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 80%;
+    color: var(--text-secondary);
+}
+.volume-control input[type=range] {
+    flex: 1;
+    accent-color: var(--colombia-yellow);
+    cursor: pointer;
+}
+
+.live-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(206, 17, 38, 0.2);
+    color: #fca5a5;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid rgba(206, 17, 38, 0.4);
+}
+.pulse-dot {
+    width: 6px;
+    height: 6px;
+    background-color: var(--colombia-red);
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+}
+@keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.6); opacity: 0.4; } 100% { transform: scale(1); opacity: 1; } }
+
+/* Panel de Gestión y Selector */
+.admin-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 20px;
+    border: 1px solid var(--border-color);
+}
+.admin-card h3 { font-size: 1.1rem; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+.admin-card .desc { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 20px; }
+
+.form-group { margin-bottom: 15px; }
+.form-group label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+}
+.form-group input, .styled-select {
+    width: 100%;
+    background: #0f172a;
+    border: 1px solid var(--border-color);
+    padding: 10px 14px;
+    border-radius: 10px;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+.form-group input:focus, .styled-select:focus {
+    border-color: var(--colombia-yellow);
+    outline: none;
+}
+
+.admin-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+.btn-primary, .btn-secondary {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+.btn-primary { background-color: var(--colombia-yellow); color: #0f172a; }
+.btn-secondary { background-color: #334155; color: var(--text-primary); }
+
+.server-diagnostics {
+    margin-top: 25px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+}
+.server-diagnostics h4 { font-size: 0.85rem; margin-bottom: 10px; color: var(--text-secondary); }
+.diagnostic-list { list-style: none; font-size: 0.8rem; display: flex; flex-direction: column; gap: 6px; }
+.diagnostic-list li { display: flex; justify-content: space-between; }
+
+/* Navegación Inferior */
+.bottom-nav {
+    height: 70px;
+    background: var(--card-bg);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+.nav-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.7rem;
+    cursor: pointer;
+    flex: 1;
+    transition: color 0.2s;
+}
+.nav-btn i { font-size: 1.2rem; }
+.nav-btn.active { color: var(--colombia-yellow); }
+
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
