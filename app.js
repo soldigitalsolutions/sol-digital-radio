@@ -29,11 +29,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Emisoras con enlaces de streaming directos, seguros (HTTPS) y estables
+    // Enlaces de audio directo verificados (Streams crudos compatibles con navegadores)
     let stations = JSON.parse(localStorage.getItem('sol_stations')) || [
-        { name: "Sol Digital Radio (Lofi 24/7)", url: "https://stream.zeno.fm/f3wvbbqmdg8uv" },
-        { name: "Jazz Classics Stream", url: "https://icecast.jazzradio.com/jazz-high.mp3" },
-        { name: "Classical Masterpieces", url: "https://stream.zeno.fm/0r0xa792kwzuv" }
+        { name: "Lofi Beats (Prueba Directa)", url: "https://stream.zeno.fm/f3wvbbqmdg8uv" },
+        { name: "Jazz Classics (Prueba Directa)", url: "https://icecast.jazzradio.com/jazz-high.mp3" }
     ];
 
     let activeStationIndex = 0;
@@ -100,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const url = inputStreamUrl.value.trim();
 
         if (!name || !url) {
-            alert('Por favor completa el nombre y la URL de la emisora.');
+            alert('Por favor completa el nombre y la URL del stream.');
             return;
         }
 
@@ -113,7 +112,6 @@ document.addEventListener('DOMContentLoaded', () => {
         inputStationName.value = '';
         inputStreamUrl.value = '';
         alert('¡Emisora agregada a la rocola con éxito!');
-        checkServerStatus();
     });
 
     playPauseBtn.addEventListener('click', () => {
@@ -142,11 +140,11 @@ document.addEventListener('DOMContentLoaded', () => {
             isPlaying = true;
             playIcon.className = 'fa-solid fa-pause';
             vinylDisc.classList.add('playing');
-            statusText.textContent = 'En Vivo';
+            statusText.textContent = 'Reproduciendo';
             serverStatusIndicator.className = 'server-status-pill online';
         }).catch(err => {
             console.error("Error al reproducir:", err);
-            statusText.textContent = 'Error de reproducción';
+            statusText.textContent = 'Error de stream';
             serverStatusIndicator.className = 'server-status-pill offline';
             isPlaying = false;
             playIcon.className = 'fa-solid fa-play';
@@ -162,17 +160,15 @@ document.addEventListener('DOMContentLoaded', () => {
         vinylDisc.classList.remove('playing');
         statusText.textContent = 'Detenido';
         serverStatusIndicator.className = 'server-status-pill';
-        wakingBanner.classList.add('hidden');
     }
 
     volumeSlider.addEventListener('input', (e) => {
         audioStream.volume = e.target.value;
     });
 
-    async function checkServerStatus() {
+    function checkServerStatus() {
         serverStatusIndicator.className = 'server-status-pill online';
         statusText.textContent = 'Rocola Lista';
-        wakingBanner.classList.add('hidden');
     }
 
     if (pingServerBtn) {
