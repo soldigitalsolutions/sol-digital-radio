@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderCatalog();
     }
 
-    // Renderizar Panel de Administración (Gestor de Radios)
+    // Renderizar Panel de Administración
     function renderAdminList() {
         adminStationsList.innerHTML = '';
         
@@ -145,7 +145,6 @@ document.addEventListener('DOMContentLoaded', () => {
             adminStationsList.appendChild(row);
         });
 
-        // Eventos de edición y borrado
         adminStationsList.querySelectorAll('.save-station-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const idx = e.currentTarget.getAttribute('data-index');
@@ -176,7 +175,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Pestañas de filtrado
     dirTabs.forEach(tab => {
         tab.addEventListener('click', () => {
             dirTabs.forEach(t => t.classList.remove('active'));
@@ -186,21 +184,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Botón Compartir App
     shareAppBtn.addEventListener('click', () => {
         if (navigator.share) {
             navigator.share({
                 title: 'Sol Digital Radio',
-                text: '¡Escucha las mejores emisoras de Colombia y el mundo en Sol Digital Radio!',
+                text: '¡Escucha las mejores emisoras en Sol Digital Radio!',
                 url: window.location.href
             }).catch(() => {});
         } else {
             navigator.clipboard.writeText(window.location.href);
-            alert('¡Enlace de la aplicación copiado al portapapeles!');
+            alert('¡Enlace copiado al portapapeles!');
         }
     });
 
-    // Sistema de Contraseña Oculta para el Kiosko
     openAdminModalBtn.addEventListener('click', () => {
         adminPasswordInput.value = '';
         adminPasswordModal.classList.remove('hidden');
@@ -224,7 +220,6 @@ document.addEventListener('DOMContentLoaded', () => {
         adminDashboardModal.classList.add('hidden');
     });
 
-    // Añadir Nueva Radio
     addStationBtn.addEventListener('click', () => {
         const name = inputStationName.value.trim();
         const category = inputStationCategory.value;
@@ -259,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('¡Radio agregada con éxito al Kiosko!');
     });
 
-    // Controles de Reproducción
+    // --- CONTROLES DE REPRODUCCIÓN CORREGIDOS Y ACTIVOS ---
     playPauseBtn.addEventListener('click', () => {
         if (!isPlaying) {
             startPlayback();
@@ -269,12 +264,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     nextBtn.addEventListener('click', () => {
+        if (stations.length === 0) return;
         activeStationIndex = (activeStationIndex + 1) % stations.length;
         updateActiveStation();
         startPlayback();
     });
 
     prevBtn.addEventListener('click', () => {
+        if (stations.length === 0) return;
         activeStationIndex = (activeStationIndex - 1 + stations.length) % stations.length;
         updateActiveStation();
         startPlayback();
