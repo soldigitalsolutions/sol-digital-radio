@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const stationCoverFrame = document.getElementById('stationCoverFrame');
     const stationsCatalogGrid = document.getElementById('stationsCatalogGrid');
     
-    // Elementos Compartir y Kiosko Oculto
+    // Elementos Compartir y Gestión
     const shareAppBtn = document.getElementById('shareAppBtn');
     const openAdminModalBtn = document.getElementById('openAdminModalBtn');
     const adminPasswordModal = document.getElementById('adminPasswordModal');
@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Panel Dashboard
     const adminDashboardModal = document.getElementById('adminDashboardModal');
     const closeDashboardBtn = document.getElementById('closeDashboardBtn');
+    const downloadIndexBtn = document.getElementById('downloadIndexBtn');
     const addStationBtn = document.getElementById('addStationBtn');
     const inputStationName = document.getElementById('inputStationName');
     const inputStationCategory = document.getElementById('inputStationCategory');
@@ -36,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const dirTabs = document.querySelectorAll('.dir-tab');
 
     // Catálogo por defecto
-    let stations = JSON.parse(localStorage.getItem('sol_stations_v5')) || [
+    let stations = JSON.parse(localStorage.getItem('sol_stations_v6')) || [
         { 
             name: "Sol Lofi Radio", 
             category: "colombia", 
@@ -154,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 stations[idx].url = adminStationsList.querySelector(`.edit-url[data-index="${idx}"]`).value;
                 stations[idx].logo = adminStationsList.querySelector(`.edit-logo[data-index="${idx}"]`).value;
 
-                localStorage.setItem('sol_stations_v5', JSON.stringify(stations));
+                localStorage.setItem('sol_stations_v6', JSON.stringify(stations));
                 renderCatalog();
                 updateActiveStation();
                 alert('¡Radio actualizada con éxito!');
@@ -166,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const idx = e.currentTarget.getAttribute('data-index');
                 if (confirm(`¿Eliminar la radio "${stations[idx].name}"?`)) {
                     stations.splice(idx, 1);
-                    localStorage.setItem('sol_stations_v5', JSON.stringify(stations));
+                    localStorage.setItem('sol_stations_v6', JSON.stringify(stations));
                     renderCatalog();
                     updateActiveStation();
                     renderAdminList();
@@ -220,6 +221,21 @@ document.addEventListener('DOMContentLoaded', () => {
         adminDashboardModal.classList.add('hidden');
     });
 
+    // Función para descargar el index.html actualizado para GitHub
+    downloadIndexBtn.addEventListener('click', () => {
+        const htmlContent = document.documentElement.outerHTML;
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'index.html';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        alert('¡Archivo index.html descargado con éxito para subir a GitHub!');
+    });
+
     addStationBtn.addEventListener('click', () => {
         const name = inputStationName.value.trim();
         const category = inputStationCategory.value;
@@ -240,7 +256,7 @@ document.addEventListener('DOMContentLoaded', () => {
             logo: logo || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&auto=format&fit=crop&q=80'
         });
 
-        localStorage.setItem('sol_stations_v5', JSON.stringify(stations));
+        localStorage.setItem('sol_stations_v6', JSON.stringify(stations));
         activeStationIndex = stations.length - 1;
         
         inputStationName.value = '';
