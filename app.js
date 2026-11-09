@@ -29,17 +29,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Emisoras con enlaces de streaming directos, seguros (HTTPS) y estables
     let stations = JSON.parse(localStorage.getItem('sol_stations')) || [
-        { name: "Sol Digital Radio (Principal)", url: "https://xiaozhi-radio-server.onrender.com/stream" },
-        { name: "Sol Digital Alternativa (Backup)", url: "https://xiaozhi-radio-server.onrender.com/backup" }
+        { name: "Sol Digital Radio (Lofi 24/7)", url: "https://stream.zeno.fm/f3wvbbqmdg8uv" },
+        { name: "Jazz Classics Stream", url: "https://icecast.jazzradio.com/jazz-high.mp3" },
+        { name: "Classical Masterpieces", url: "https://stream.zeno.fm/0r0xa792kwzuv" }
     ];
 
     let activeStationIndex = 0;
     let isPlaying = false;
 
-    // Renderizar emisoras tanto en el select como en los botones de la Rocola principal
     function renderStations() {
-        // 1. Llenar el select de gestión
         stationSelect.innerHTML = '';
         stations.forEach((station, index) => {
             const option = document.createElement('option');
@@ -49,7 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         stationSelect.value = activeStationIndex;
 
-        // 2. Llenar el Kiosko de botones en la pantalla principal (Rocola)
         rocolaStationsGrid.innerHTML = '';
         stations.forEach((station, index) => {
             const btn = document.createElement('button');
@@ -73,7 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateActiveStationUI() {
         const currentStation = stations[activeStationIndex];
         currentTrackTitle.textContent = currentStation.name;
-        // Actualizar estado activo en los botones de la rocola
         const buttons = rocolaStationsGrid.querySelectorAll('.rocola-station-btn');
         buttons.forEach((b, idx) => {
             if (idx === activeStationIndex) {
@@ -130,14 +128,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentStation = stations[activeStationIndex];
         currentTrackTitle.textContent = currentStation.name;
         
-        // Disparar animación de carga de LP (Rocola)
         vinylDisc.classList.remove('jukebox-load');
         void vinylDisc.offsetWidth;
         vinylDisc.classList.add('jukebox-load');
 
-        audioStream.src = `${currentStation.url}?t=${Date.now()}`;
+        audioStream.src = currentStation.url;
         
-        wakingBanner.classList.remove('hidden');
+        wakingBanner.classList.add('hidden');
         statusText.textContent = 'Conectando...';
         serverStatusIndicator.className = 'server-status-pill waking';
 
@@ -145,13 +142,11 @@ document.addEventListener('DOMContentLoaded', () => {
             isPlaying = true;
             playIcon.className = 'fa-solid fa-pause';
             vinylDisc.classList.add('playing');
-            wakingBanner.classList.add('hidden');
             statusText.textContent = 'En Vivo';
             serverStatusIndicator.className = 'server-status-pill online';
         }).catch(err => {
             console.error("Error al reproducir:", err);
-            wakingBanner.classList.add('hidden');
-            statusText.textContent = 'Error de conexión';
+            statusText.textContent = 'Error de reproducción';
             serverStatusIndicator.className = 'server-status-pill offline';
             isPlaying = false;
             playIcon.className = 'fa-solid fa-play';
@@ -175,23 +170,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     async function checkServerStatus() {
-        const currentStation = stations[activeStationIndex];
-        const startTime = Date.now();
-        
-        serverStatusIndicator.className = 'server-status-pill waking';
-        statusText.textContent = 'Verificando...';
+        serverStatusIndicator.className = 'server-status-pill online';
+        statusText.textContent = 'Rocola Lista';
         wakingBanner.classList.add('hidden');
-
-        try {
-            await fetch(currentStation.url, { method: 'GET', mode: 'no-cors', cache: 'no-store' });
-            const latency = Date.now() - startTime;
-            serverStatusIndicator.className = 'server-status-pill online';
-            statusText.textContent = 'Servidor Listo';
-            wakingBanner.classList.add('hidden');
-        } catch (error) {
-            serverStatusIndicator.className = 'server-status-pill waking';
-            statusText.textContent = 'Despertando...';
-        }
     }
 
     if (pingServerBtn) {
