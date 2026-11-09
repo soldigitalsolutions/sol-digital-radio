@@ -1,44 +1,25 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sol Digital Radio - Jukebox Center</title>
-    
-    <!-- PWA Meta Tags -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#FCD116">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="assets/icon-192.png">
-
-    <!-- Google Fonts & FontAwesome -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Estilos -->
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-    <!-- Contenedor General tipo Gabinete de Rocola -->
-    <div class="jukebox-cabinet">
-        
-        <!-- Pantalla / Cabecera con el Sol Radiante Ampliado y Notas Musicales -->
+<!-- Pantalla / Cabecera con el Sol-Disco y Satélite en Órbita -->
         <header class="cabinet-header">
             <div class="brand-title-group">
-                <!-- Icono de Sol Ampliado con Rayos, Satélite y Emisión de Notas Musicales -->
+                <!-- Logotipo: Sol-Disco con Órbita, Satélite y Estela Musical -->
                 <div class="solar-logo-container">
+                    <!-- Sol-Disco con núcleo de disco y rayos -->
                     <div class="solar-core">
+                        <div class="solar-rays"></div>
                         <i class="fa-solid fa-compact-disc core-icon"></i>
                     </div>
-                    <div class="solar-rays"></div>
-                    <div class="satellite-orbit">
-                        <i class="fa-solid fa-satellite satellite-icon"></i>
+                    <!-- Órbita y Satélite -->
+                    <div class="satellite-orbit-path">
+                        <div class="satellite-orbit">
+                            <i class="fa-solid fa-satellite satellite-icon"></i>
+                            <!-- Estela de Notas musicales que viajan con el satélite -->
+                            <span class="satellite-tail">
+                                <span class="trail-note">♫</span>
+                                <span class="trail-note">♪</span>
+                                <span class="trail-note">♩</span>
+                            </span>
+                        </div>
                     </div>
-                    <!-- Notas musicales flotantes saliendo del sol -->
-                    <span class="floating-note note-1">♫</span>
-                    <span class="floating-note note-2">♪</span>
                 </div>
                 <div class="brand-text">
                     <h1>Sol Digital Radio</h1>
@@ -49,163 +30,3 @@
                 <span class="dot"></span> <span id="statusText">Rocola Lista</span>
             </div>
         </header>
-
-        <!-- Contenedor Principal (Dashboard PC / Móvil) -->
-        <div class="cabinet-main-layout">
-            
-            <!-- PANEL IZQUIERDO: Consola de Reproducción -->
-            <section class="console-screen-panel">
-                <div class="virtual-screen">
-                    <div class="screen-header-bar">
-                        <span><i class="fa-solid fa-tower-broadcast"></i> EN TRANSMISIÓN</span>
-                        <span class="live-badge-mini"><span class="pulse-dot"></span> LIVE</span>
-                    </div>
-                    
-                    <div class="screen-content">
-                        <!-- Portada / Logo de la Emisora Activa -->
-                        <div class="station-cover-frame" id="stationCoverFrame">
-                            <img id="stationLogoImg" src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&auto=format&fit=crop&q=80" alt="Logo Emisora">
-                            <div class="equalizer-overlay">
-                                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
-                            </div>
-                        </div>
-
-                        <!-- Información de la Emisora -->
-                        <div class="station-info-display">
-                            <h2 id="currentTrackTitle">Selecciona una Emisora</h2>
-                            <p id="currentTrackCategory">Catálogo Sol Digital</p>
-                            <span id="currentGenreBadge" class="genre-tag">Género</span>
-                        </div>
-                    </div>
-
-                    <!-- Controles de Reproducción -->
-                    <div class="screen-controls-deck">
-                        <div class="volume-box">
-                            <i class="fa-solid fa-volume-low"></i>
-                            <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.8">
-                            <i class="fa-solid fa-volume-high"></i>
-                        </div>
-
-                        <div class="playback-buttons-group">
-                            <button id="prevBtn" class="deck-btn" title="Emisora Anterior"><i class="fa-solid fa-backward-step"></i></button>
-                            <button id="playPauseBtn" class="deck-btn play-main-btn" title="Reproducir / Pausa">
-                                <i class="fa-solid fa-play" id="playIcon"></i>
-                            </button>
-                            <button id="nextBtn" class="deck-btn" title="Emisora Siguiente"><i class="fa-solid fa-forward-step"></i></button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Botón Compartir App y Acceso Oculto a Gestión -->
-                <div class="actions-footer-box">
-                    <button id="shareAppBtn" class="share-app-btn">
-                        <i class="fa-solid fa-share-nodes"></i> Compartir App
-                    </button>
-                    <button id="openAdminModalBtn" class="hidden-admin-trigger">
-                        <i class="fa-solid fa-lock"></i> Gestionar Kiosko
-                    </button>
-                </div>
-            </section>
-
-            <!-- PANEL DERECHO: Directorio y Selector de Emisoras -->
-            <section class="directory-panel">
-                <div class="directory-tabs">
-                    <button class="dir-tab active" data-category="all">Todas</button>
-                    <button class="dir-tab" data-category="colombia">🇨🇴 Colombia</button>
-                    <button class="dir-tab" data-category="internacional">🌍 Internacional</button>
-                </div>
-
-                <!-- Lista de Emisoras en Tarjetas (Grid Visual) -->
-                <div class="stations-catalog-grid" id="stationsCatalogGrid">
-                    <!-- Dinámico -->
-                </div>
-            </section>
-
-        </div>
-
-        <!-- Franja Tricolor de Colombia (Ubicación Inferior) -->
-        <div class="colombia-flag-bar">
-            <div class="stripe yellow"></div>
-            <div class="stripe blue"></div>
-            <div class="stripe red"></div>
-        </div>
-
-        <!-- Firma Oficial Inferior -->
-        <footer class="cabinet-footer">
-            <div class="signature-content">
-                <span class="brand-signature">Sol Digital Solutions <span class="by-text">by</span> <span class="epamar-text">EPamar</span></span>
-                <p class="copyright">&copy; 2025 - 2026 &bull; Todos los derechos reservados</p>
-            </div>
-        </footer>
-
-    </div>
-
-    <!-- MODAL DE GESTIÓN PROTEGIDO POR CONTRASEÑA -->
-    <div id="adminPasswordModal" class="admin-modal hidden">
-        <div class="admin-card auth-box">
-            <h3><i class="fa-solid fa-lock"></i> Seguridad de Kiosko</h3>
-            <p class="desc">Ingresa la contraseña para acceder al panel de administración.</p>
-            <div class="form-group">
-                <input type="password" id="adminPasswordInput" placeholder="Contraseña...">
-            </div>
-            <div class="admin-actions">
-                <button id="submitPasswordBtn" class="btn-primary">Ingresar</button>
-                <button id="cancelPasswordBtn" class="btn-secondary">Cancelar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- PANEL DE ADMINISTRACIÓN / GESTOR DE RADIOS -->
-    <div id="adminDashboardModal" class="admin-modal hidden">
-        <div class="admin-dashboard-container">
-            <div class="dashboard-top-bar">
-                <h3><i class="fa-solid fa-sliders"></i> Panel de Gestión de Radios</h3>
-                <button id="closeDashboardBtn" class="close-dash-btn"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-
-            <div class="dashboard-grid-split">
-                <!-- Columna Izquierda: Añadir Nueva Radio -->
-                <div class="add-station-form-card">
-                    <h4><i class="fa-solid fa-plus-circle"></i> Nueva Radio</h4>
-                    <div class="form-group">
-                        <label>Nombre</label>
-                        <input type="text" id="inputStationName" placeholder="Ej: Tropicana">
-                    </div>
-                    <div class="form-group">
-                        <label>Nacionalidad</label>
-                        <select id="inputStationCategory" class="styled-select">
-                            <option value="colombia">Colombia (Por defecto)</option>
-                            <option value="internacional">Internacional</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Género Musical</label>
-                        <input type="text" id="inputStationGenre" placeholder="Ej: Salsa / Pop / Vallenato">
-                    </div>
-                    <div class="form-group">
-                        <label>Enlace Stream (HTTPS)</label>
-                        <input type="url" id="inputStreamUrl" placeholder="https://...">
-                    </div>
-                    <div class="form-group">
-                        <label>Portada URL</label>
-                        <input type="url" id="inputStationLogo" placeholder="https://...">
-                    </div>
-                    <button id="addStationBtn" class="btn-primary full-btn">Agregar al Kiosko</button>
-                </div>
-
-                <!-- Columna Derecha: Configurar y Editar Radios Existentes -->
-                <div class="configure-stations-card">
-                    <h4><i class="fa-solid fa-pen-to-square"></i> Configurar Enlaces y Portadas</h4>
-                    <div id="adminStationsList" class="admin-stations-scroll">
-                        <!-- Generado dinámicamente -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Audio Oculto -->
-    <audio id="audioStream" preload="none"></audio>
-    <script src="app.js"></script>
-</body>
-</html>
