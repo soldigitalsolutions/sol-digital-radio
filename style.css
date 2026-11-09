@@ -1,372 +1,116 @@
-:root {
-    --bg-color: #0b0f19;
-    --cabinet-bg: #131c2e;
-    --screen-bg: #070a12;
-    --card-bg: #1a263d;
-    --border-color: #2a3b5c;
-    --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
-    
-    --colombia-yellow: #FCD116;
-    --colombia-blue: #003893;
-    --colombia-red: #CE1126;
-    --accent-glow: rgba(252, 209, 22, 0.35);
-}
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Poppins', sans-serif;
-    -webkit-tap-highlight-color: transparent;
-}
-
-body {
-    background-color: var(--bg-color);
-    background-image: 
-        radial-gradient(circle at 50% 20%, rgba(26, 38, 61, 0.6) 0%, rgba(11, 15, 25, 0.95) 100%),
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Ctext x='20' y='50' font-size='22' opacity='0.03' fill='%23FCD116'%3E♫%3C/text%3E%3Ctext x='75' y='95' font-size='24' opacity='0.03' fill='%23003893'%3E♩%3C/text%3E%3C/svg%3E");
-    color: var(--text-primary);
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 15px;
-}
-
-.jukebox-cabinet {
-    width: 100%;
-    max-width: 1100px;
-    background-color: var(--cabinet-bg);
-    border: 2px solid var(--border-color);
-    border-radius: 24px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), inset 0 0 25px rgba(252, 209, 22, 0.05);
-    display: flex;
-    flex-direction: column;
-    overflow: visible; /* Permite que las notas musicales destaquen con elegancia */
-    position: relative;
-}
-
-.cabinet-header {
-    padding: 15px 25px;
-    background: linear-gradient(180deg, #1a263d 0%, #131c2e 100%);
-    border-bottom: 1px solid var(--border-color);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-/* --- LOGO SOL RADIANTE AMPLIADO CON NOTAS MUSICALES Y SATÉLITE --- */
+/* --- LOGOTIPO: SOL-DISCO AMPLIADO CON SATÉLITE EN ÓRBITA Y ESTELA --- */
 .brand-title-group {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 16px;
 }
 .solar-logo-container {
-    width: 54px;
-    height: 54px;
+    width: 68px; /* Tamaño ampliado para mejor visibilidad */
+    height: 68px;
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
 }
+
+/* El Sol fusionado con Disco */
 .solar-core {
-    width: 30px;
-    height: 30px;
-    background: linear-gradient(135deg, #FCD116, #f59e0b);
+    width: 40px;
+    height: 40px;
+    background: radial-gradient(circle, #FCD116 30%, #f59e0b 80%, #d97706 100%);
     border-radius: 50%;
-    box-shadow: 0 0 16px var(--colombia-yellow);
+    box-shadow: 0 0 18px rgba(252, 209, 22, 0.6);
     display: flex;
     justify-content: center;
     align-items: center;
-    animation: solarBreath 2.5s infinite ease-in-out;
+    position: relative;
+    z-index: 5;
+    animation: solarPulse 2.5s infinite ease-in-out;
 }
-.core-icon {
-    font-size: 0.75rem;
-    color: #0b0f19;
+@keyframes solarPulse {
+    0%, 100% { transform: scale(0.94); box-shadow: 0 0 12px rgba(252, 209, 22, 0.5); }
+    50% { transform: scale(1.06); box-shadow: 0 0 22px rgba(252, 209, 22, 0.8); }
 }
-@keyframes solarBreath {
-    0%, 100% { transform: scale(0.92); box-shadow: 0 0 10px var(--colombia-yellow); }
-    50% { transform: scale(1.08); box-shadow: 0 0 20px var(--colombia-yellow); }
-}
+
+/* Rayos del Sol de Revista Digital */
 .solar-rays {
     position: absolute;
-    width: 48px;
-    height: 48px;
+    width: 58px;
+    height: 58px;
     border-radius: 50%;
-    border: 2.5px dashed rgba(252, 209, 22, 0.7);
-    animation: spinRays 8s linear infinite;
+    border: 3px dashed rgba(252, 209, 22, 0.85);
+    animation: spinRays 12s linear infinite;
 }
 @keyframes spinRays {
     100% { transform: rotate(360deg); }
 }
+
+/* Icono del Disco de Música en el núcleo */
+.core-icon {
+    font-size: 1.1rem;
+    color: #0b0f19;
+    z-index: 6;
+    animation: spinRecord 4s linear infinite;
+}
+@keyframes spinRecord {
+    100% { transform: rotate(-360deg); } /* Gira en dirección contraria a los rayos */
+}
+
+/* Órbita Concéntrica en Puntos Dorados */
+.satellite-orbit-path {
+    position: absolute;
+    width: 66px;
+    height: 66px;
+    border-radius: 50%;
+    border: 1.5px dashed rgba(252, 209, 22, 0.4); /* Línea orbital concéntrica */
+    z-index: 10;
+}
+
+/* Satélite en Órbita */
 .satellite-orbit {
     position: absolute;
-    width: 56px;
-    height: 56px;
-    animation: orbitSatellite 4s linear infinite;
+    width: 100%;
+    height: 100%;
+    top: 0; left: 0;
+    animation: orbitOnSatellite 5s linear infinite; /* Tiempo orbital sutil y fluido */
 }
-@keyframes orbitSatellite {
+@keyframes orbitOnSatellite {
     100% { transform: rotate(360deg); }
 }
 .satellite-icon {
     position: absolute;
-    top: -3px;
+    top: -5px; /* Ajuste para correr exactamente por la órbita concéntrica */
     left: 50%;
-    transform: translateX(-50%);
-    font-size: 0.7rem;
+    transform: translateX(-50%) rotate(45deg);
+    font-size: 0.75rem;
     color: #38bdf8;
     filter: drop-shadow(0 0 5px #38bdf8);
 }
 
-/* Emisión de Notas Musicales Animadas */
-.floating-note {
+/* Estela Musical detrás del Satélite */
+.satellite-tail {
     position: absolute;
-    font-size: 0.75rem;
-    color: var(--colombia-yellow);
-    opacity: 0;
-    pointer-events: none;
-}
-.note-1 {
-    animation: floatNote1 3s infinite ease-out;
-}
-.note-2 {
-    animation: floatNote2 3s infinite ease-out 1.5s;
-}
-@keyframes floatNote1 {
-    0% { transform: translate(0, 0) scale(0.6); opacity: 0; }
-    30% { opacity: 0.9; }
-    100% { transform: translate(28px, -28px) scale(1.2); opacity: 0; }
-}
-@keyframes floatNote2 {
-    0% { transform: translate(0, 0) scale(0.6); opacity: 0; }
-    30% { opacity: 0.9; }
-    100% { transform: translate(-28px, -26px) scale(1.2); opacity: 0; }
-}
-
-.brand-text h1 { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); }
-.brand-text .subtitle { font-size: 0.7rem; color: var(--text-secondary); letter-spacing: 0.5px; }
-
-.server-status-pill {
+    top: -3px;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--screen-bg);
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 0.7rem;
-    border: 1px solid var(--border-color);
-}
-.server-status-pill .dot { width: 7px; height: 7px; border-radius: 50%; background-color: #22c55e; box-shadow: 0 0 8px #22c55e; }
-
-/* Layout Adaptable */
-.cabinet-main-layout {
-    display: grid;
-    grid-template-columns: 1fr 1.3fr;
-    gap: 20px;
-    padding: 25px;
-    flex: 1;
-}
-@media (max-width: 768px) {
-    .cabinet-main-layout { grid-template-columns: 1fr; padding: 15px; }
-}
-
-.console-screen-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-.virtual-screen {
-    background-color: var(--screen-bg);
-    border: 2px solid var(--border-color);
-    border-radius: 16px;
-    padding: 18px;
-    display: flex;
-    flex-direction: column;
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-}
-.screen-header-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.7rem;
-    color: var(--text-secondary);
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 8px;
-    margin-bottom: 15px;
-}
-.live-badge-mini {
-    background: rgba(206, 17, 38, 0.2);
-    color: #fca5a5;
-    padding: 2px 8px;
-    border-radius: 8px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
     gap: 4px;
 }
-.pulse-dot { width: 6px; height: 6px; background-color: var(--colombia-red); border-radius: 50%; animation: pulse 1.5s infinite; }
-@keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.6); opacity: 0.4; } 100% { transform: scale(1); opacity: 1; } }
-
-.station-cover-frame {
-    width: 100%;
-    height: 160px;
-    background: #000;
-    border-radius: 12px;
-    overflow: hidden;
-    position: relative;
-    border: 1px solid var(--border-color);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.station-cover-frame img { width: 100%; height: 100%; object-fit: cover; }
-
-.equalizer-overlay {
-    position: absolute; bottom: 10px; right: 10px;
-    display: flex; gap: 3px; align-items: flex-end; height: 20px;
-    background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 6px; opacity: 0; transition: opacity 0.3s;
-}
-.station-cover-frame.playing .equalizer-overlay { opacity: 1; }
-.equalizer-overlay .bar {
-    width: 3px; background-color: var(--colombia-yellow); animation: eqBounce 0.8s infinite alternate ease-in-out;
-}
-.equalizer-overlay .bar:nth-child(2) { animation-delay: 0.2s; }
-.equalizer-overlay .bar:nth-child(3) { animation-delay: 0.4s; }
-.equalizer-overlay .bar:nth-child(4) { animation-delay: 0.1s; }
-@keyframes eqBounce { 0% { height: 4px; } 100% { height: 18px; } }
-
-.station-info-display { margin-top: 12px; text-align: center; }
-.station-info-display h2 { font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
-.station-info-display p { font-size: 0.75rem; color: var(--text-secondary); }
-.genre-tag {
-    display: inline-block; margin-top: 6px; background: rgba(252, 209, 22, 0.15);
-    color: var(--colombia-yellow); padding: 2px 10px; border-radius: 10px; font-size: 0.65rem; font-weight: 600;
+.trail-note {
+    font-size: 0.55rem;
+    color: var(--colombia-yellow);
+    opacity: 0;
+    font-weight: 700;
+    text-shadow: 0 0 4px var(--colombia-yellow);
 }
 
-.screen-controls-deck {
-    margin-top: 15px; padding-top: 12px; border-top: 1px solid var(--border-color);
-    display: flex; flex-direction: column; gap: 10px;
-}
-.volume-box { display: flex; align-items: center; gap: 10px; color: var(--text-secondary); font-size: 0.8rem; }
-.volume-box input[type=range] { flex: 1; accent-color: var(--colombia-yellow); cursor: pointer; }
+/* Pequeñas notas vibrantes que nacen del movimiento del satélite */
+.trail-note:nth-child(1) { animation: trailFade 1.2s infinite ease-out 0s; }
+.trail-note:nth-child(2) { animation: trailFade 1.2s infinite ease-out 0.4s; }
+.trail-note:nth-child(3) { animation: trailFade 1.2s infinite ease-out 0.8s; }
 
-.playback-buttons-group { display: flex; justify-content: center; align-items: center; gap: 15px; }
-.deck-btn {
-    background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-primary);
-    width: 38px; height: 38px; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 0.85rem;
-    transition: all 0.2s;
+@keyframes trailFade {
+    0% { transform: translate(-5px, -3px) scale(0.4); opacity: 0; }
+    50% { opacity: 0.95; }
+    100% { transform: translate(-25px, -8px) scale(0.9); opacity: 0; }
 }
-.deck-btn:hover { border-color: var(--colombia-yellow); color: var(--colombia-yellow); transform: scale(1.05); }
-.play-main-btn {
-    width: 50px; height: 50px; background: linear-gradient(135deg, var(--colombia-yellow), #eab308);
-    color: #0b0f19; font-size: 1.1rem; border: none; box-shadow: 0 0 15px var(--accent-glow);
-}
-
-.actions-footer-box {
-    display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 5px;
-}
-.share-app-btn {
-    width: 100%; max-width: 260px; background: linear-gradient(135deg, #f59e0b, #d97706);
-    color: #fff; border: none; padding: 10px; border-radius: 20px; font-weight: 600; font-size: 0.8rem; cursor: pointer;
-    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); display: flex; justify-content: center; align-items: center; gap: 8px;
-}
-.hidden-admin-trigger {
-    background: none; border: none; color: var(--text-secondary); font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 5px; opacity: 0.7; transition: opacity 0.2s;
-}
-.hidden-admin-trigger:hover { opacity: 1; color: var(--colombia-yellow); }
-
-/* Directorio */
-.directory-panel {
-    display: flex; flex-direction: column; background: var(--screen-bg); border: 2px solid var(--border-color);
-    border-radius: 16px; padding: 18px; position: relative; overflow: hidden;
-}
-.directory-tabs { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
-.dir-tab {
-    background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-secondary);
-    padding: 6px 14px; border-radius: 20px; font-size: 0.75rem; cursor: pointer; white-space: nowrap;
-}
-.dir-tab.active { background: var(--colombia-yellow); color: #0b0f19; font-weight: 600; border-color: transparent; }
-
-.stations-catalog-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; overflow-y: auto; max-height: 400px; padding-right: 4px;
-}
-.station-card-item {
-    background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px;
-    display: flex; flex-direction: column; align-items: center; text-align: center; cursor: pointer; transition: all 0.2s;
-}
-.station-card-item:hover { border-color: var(--colombia-yellow); transform: translateY(-2px); }
-.station-card-item.active { border-color: var(--colombia-yellow); background: linear-gradient(145deg, #1e293b, #131c2e); box-shadow: 0 0 10px var(--accent-glow); }
-.station-card-thumb { width: 55px; height: 55px; border-radius: 50%; overflow: hidden; margin-bottom: 6px; border: 2px solid var(--border-color); }
-.station-card-thumb img { width: 100%; height: 100%; object-fit: cover; }
-.station-card-title { font-size: 0.75rem; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
-.station-card-genre { font-size: 0.65rem; color: var(--colombia-yellow); }
-
-/* Modales */
-.admin-modal {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(7, 10, 18, 0.9);
-    display: flex; justify-content: center; align-items: center; padding: 15px; z-index: 2000;
-}
-.admin-modal.hidden { display: none; }
-.admin-card { background: var(--cabinet-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; width: 100%; max-width: 350px; }
-.admin-card h3 { font-size: 0.95rem; margin-bottom: 10px; color: var(--colombia-yellow); display: flex; align-items: center; gap: 8px; }
-.admin-card .desc { font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 15px; }
-
-.admin-dashboard-container {
-    background: var(--cabinet-bg); border: 2px solid var(--border-color); border-radius: 20px;
-    width: 100%; max-width: 900px; height: 85vh; display: flex; flex-direction: column; overflow: hidden;
-}
-.dashboard-top-bar {
-    padding: 15px 20px; background: var(--screen-bg); border-bottom: 1px solid var(--border-color);
-    display: flex; justify-content: space-between; align-items: center;
-}
-.dashboard-top-bar h3 { font-size: 1rem; color: var(--colombia-yellow); display: flex; align-items: center; gap: 8px; }
-.close-dash-btn { background: none; border: none; color: var(--text-secondary); font-size: 1.2rem; cursor: pointer; }
-
-.dashboard-grid-split {
-    display: grid; grid-template-columns: 320px 1fr; gap: 20px; padding: 20px; flex: 1; overflow: hidden;
-}
-@media (max-width: 768px) { .dashboard-grid-split { grid-template-columns: 1fr; overflow-y: auto; } }
-
-.add-station-form-card, .configure-stations-card {
-    background: var(--screen-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 15px; overflow-y: auto;
-}
-.add-station-form-card h4, .configure-stations-card h4 {
-    font-size: 0.85rem; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 6px;
-}
-.form-group { margin-bottom: 10px; }
-.form-group label { display: block; font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 3px; }
-.form-group input, .styled-select {
-    width: 100%; background: var(--bg-color); border: 1px solid var(--border-color); padding: 7px 10px;
-    border-radius: 8px; color: var(--text-primary); font-size: 0.75rem;
-}
-.form-group input:focus, .styled-select:focus { border-color: var(--colombia-yellow); outline: none; }
-.btn-primary, .btn-secondary, .btn-danger {
-    padding: 7px 12px; border-radius: 8px; border: none; font-weight: 600; font-size: 0.75rem; cursor: pointer;
-}
-.btn-primary { background: var(--colombia-yellow); color: #0b0f19; }
-.btn-secondary { background: var(--border-color); color: var(--text-primary); }
-.btn-danger { background: rgba(206, 17, 38, 0.2); color: #fca5a5; border: 1px solid rgba(206, 17, 38, 0.4); }
-.full-btn { width: 100%; margin-top: 10px; }
-
-.admin-stations-scroll { display: flex; flex-direction: column; gap: 10px; }
-.admin-station-row {
-    background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px;
-    display: flex; flex-direction: column; gap: 8px;
-}
-.admin-station-row-top { display: flex; justify-content: space-between; align-items: center; }
-.admin-station-name { font-size: 0.8rem; font-weight: 600; color: var(--text-primary); }
-.admin-station-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-
-/* Franja y Footer */
-.colombia-flag-bar { width: 100%; height: 14px; display: flex; }
-.stripe { height: 100%; flex: 1; }
-.stripe.yellow { background-color: var(--colombia-yellow); flex: 2; }
-.stripe.blue { background-color: var(--colombia-blue); }
-.stripe.red { background-color: var(--colombia-red); }
-
-.cabinet-footer { padding: 12px 20px; background: #070a12; text-align: center; border-top: 1px solid var(--border-color); }
-.brand-signature { font-size: 0.8rem; font-weight: 600; color: var(--colombia-yellow); }
-.brand-signature .by-text { color: var(--text-secondary); font-weight: 400; }
-.brand-signature .epamar-text { font-style: italic; color: #f8fafc; font-weight: 700; }
-.copyright { font-size: 0.65rem; color: var(--text-secondary); margin-top: 2px; }
