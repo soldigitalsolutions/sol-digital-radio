@@ -1,186 +1,149 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const audioStream = document.getElementById('audioStream');
-    const playPauseBtn = document.getElementById('playPauseBtn');
-    const playIcon = document.getElementById('playIcon');
-    const vinylDisc = document.getElementById('vinylDisc');
-    const volumeSlider = document.getElementById('volumeSlider');
-    const serverStatusIndicator = document.getElementById('serverStatusIndicator');
-    const statusText = document.getElementById('statusText');
-    const wakingBanner = document.getElementById('wakingBanner');
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sol Digital Radio</title>
     
-    const stationSelect = document.getElementById('stationSelect');
-    const inputStationName = document.getElementById('inputStationName');
-    const inputStreamUrl = document.getElementById('inputStreamUrl');
-    const addStationBtn = document.getElementById('addStationBtn');
-    const pingServerBtn = document.getElementById('pingServerBtn');
-    const currentTrackTitle = document.getElementById('currentTrackTitle');
-    const rocolaStationsGrid = document.getElementById('rocolaStationsGrid');
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#FCD116">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="assets/icon-192.png">
 
-    const navButtons = document.querySelectorAll('.nav-btn');
-    const views = document.querySelectorAll('.view');
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Estilos -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-    navButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            navButtons.forEach(b => b.classList.remove('active'));
-            views.forEach(v => v.classList.remove('active'));
-            btn.classList.add('active');
-            const targetView = document.getElementById(btn.getAttribute('data-target'));
-            if (targetView) targetView.classList.add('active');
-        });
-    });
+    <!-- Franja de Colores de la Bandera de Colombia -->
+    <div class="colombia-flag-bar">
+        <div class="stripe yellow"></div>
+        <div class="stripe blue"></div>
+        <div class="stripe red"></div>
+    </div>
 
-    // Emisoras con enlaces de streaming directos, seguros (HTTPS) y estables
-    let stations = JSON.parse(localStorage.getItem('sol_stations')) || [
-        { name: "Sol Digital Radio (Lofi 24/7)", url: "https://stream.zeno.fm/f3wvbbqmdg8uv" },
-        { name: "Jazz Classics Stream", url: "https://icecast.jazzradio.com/jazz-high.mp3" },
-        { name: "Classical Masterpieces", url: "https://stream.zeno.fm/0r0xa792kwzuv" }
-    ];
-
-    let activeStationIndex = 0;
-    let isPlaying = false;
-
-    function renderStations() {
-        stationSelect.innerHTML = '';
-        stations.forEach((station, index) => {
-            const option = document.createElement('option');
-            option.value = index;
-            option.textContent = station.name;
-            stationSelect.appendChild(option);
-        });
-        stationSelect.value = activeStationIndex;
-
-        rocolaStationsGrid.innerHTML = '';
-        stations.forEach((station, index) => {
-            const btn = document.createElement('button');
-            btn.className = `rocola-station-btn ${index === activeStationIndex ? 'active' : ''}`;
-            btn.innerHTML = `<i class="fa-solid fa-compact-disc"></i> ${station.name}`;
-            btn.addEventListener('click', () => {
-                activeStationIndex = index;
-                stationSelect.value = index;
-                updateActiveStationUI();
-                if (isPlaying) {
-                    stopPlayback();
-                    startPlayback();
-                } else {
-                    checkServerStatus();
-                }
-            });
-            rocolaStationsGrid.appendChild(btn);
-        });
-    }
-
-    function updateActiveStationUI() {
-        const currentStation = stations[activeStationIndex];
-        currentTrackTitle.textContent = currentStation.name;
-        const buttons = rocolaStationsGrid.querySelectorAll('.rocola-station-btn');
-        buttons.forEach((b, idx) => {
-            if (idx === activeStationIndex) {
-                b.classList.add('active');
-            } else {
-                b.classList.remove('active');
-            }
-        });
-    }
-
-    renderStations();
-
-    stationSelect.addEventListener('change', () => {
-        activeStationIndex = parseInt(stationSelect.value);
-        updateActiveStationUI();
-        if (isPlaying) {
-            stopPlayback();
-            startPlayback();
-        } else {
-            checkServerStatus();
-        }
-    });
-
-    addStationBtn.addEventListener('click', () => {
-        const name = inputStationName.value.trim();
-        const url = inputStreamUrl.value.trim();
-
-        if (!name || !url) {
-            alert('Por favor completa el nombre y la URL de la emisora.');
-            return;
-        }
-
-        stations.push({ name, url });
-        localStorage.setItem('sol_stations', JSON.stringify(stations));
-        activeStationIndex = stations.length - 1;
-        renderStations();
-        updateActiveStationUI();
+    <!-- Contenedor Principal -->
+    <div class="app-container">
         
-        inputStationName.value = '';
-        inputStreamUrl.value = '';
-        alert('¡Emisora agregada a la rocola con éxito!');
-        checkServerStatus();
-    });
+        <!-- Cabecera -->
+        <header class="app-header">
+            <div class="brand-info">
+                <h1>Sol Digital Radio</h1>
+                <span class="subtitle">by EPamar &bull; Sol Digital Solutions</span>
+            </div>
+            <div class="server-status-pill" id="serverStatusIndicator" title="Estado de la Rocola">
+                <span class="dot"></span> <span id="statusText">Verificando...</span>
+            </div>
+        </header>
 
-    playPauseBtn.addEventListener('click', () => {
-        if (!isPlaying) {
-            startPlayback();
-        } else {
-            stopPlayback();
-        }
-    });
+        <!-- Notificación Ocultable -->
+        <div id="wakingBanner" class="waking-banner hidden">
+            <i class="fa-solid fa-mug-hot fa-bounce"></i>
+            <div>
+                <strong>Conectando señal...</strong>
+                <p>Estableciendo flujo con el servidor de streaming.</p>
+            </div>
+        </div>
 
-    function startPlayback() {
-        const currentStation = stations[activeStationIndex];
-        currentTrackTitle.textContent = currentStation.name;
-        
-        vinylDisc.classList.remove('jukebox-load');
-        void vinylDisc.offsetWidth;
-        vinylDisc.classList.add('jukebox-load');
+        <!-- Vistas de la Aplicación -->
+        <main class="main-content">
+            
+            <!-- VISTA 1: REPRODUCTOR / ROCOLA -->
+            <section id="playerView" class="view active">
+                <div class="visualizer-card">
+                    <div class="vinyl-container" id="vinylDisc">
+                        <div class="vinyl-grooves"></div>
+                        <div class="vinyl-label">
+                            <i class="fa-solid fa-compact-disc fa-spin-slow"></i>
+                        </div>
+                    </div>
+                    <div class="track-info">
+                        <h2 id="currentTrackTitle">Selecciona una emisora</h2>
+                        <p id="currentTrackArtist">Sol Digital Solutions Jukebox</p>
+                    </div>
+                </div>
 
-        audioStream.src = currentStation.url;
-        
-        wakingBanner.classList.add('hidden');
-        statusText.textContent = 'Conectando...';
-        serverStatusIndicator.className = 'server-status-pill waking';
+                <!-- Kiosko de Emisoras (Botones de Rocola en Pantalla Principal) -->
+                <div class="rocola-section">
+                    <h4><i class="fa-solid fa-compact-disc"></i> Selecciona tu Disco / Emisora:</h4>
+                    <div id="rocolaStationsGrid" class="rocola-grid">
+                        <!-- Se generan dinámicamente con JavaScript -->
+                    </div>
+                </div>
 
-        audioStream.play().then(() => {
-            isPlaying = true;
-            playIcon.className = 'fa-solid fa-pause';
-            vinylDisc.classList.add('playing');
-            statusText.textContent = 'En Vivo';
-            serverStatusIndicator.className = 'server-status-pill online';
-        }).catch(err => {
-            console.error("Error al reproducir:", err);
-            statusText.textContent = 'Error de reproducción';
-            serverStatusIndicator.className = 'server-status-pill offline';
-            isPlaying = false;
-            playIcon.className = 'fa-solid fa-play';
-            vinylDisc.classList.remove('playing');
-        });
-    }
+                <div class="player-controls">
+                    <div class="volume-control">
+                        <i class="fa-solid fa-volume-low"></i>
+                        <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.8">
+                        <i class="fa-solid fa-volume-high"></i>
+                    </div>
+                    <button id="playPauseBtn" class="play-btn">
+                        <i class="fa-solid fa-play" id="playIcon"></i>
+                    </button>
+                    <div class="live-badge">
+                        <span class="pulse-dot"></span> EN VIVO
+                    </div>
+                </div>
+            </section>
 
-    function stopPlayback() {
-        audioStream.pause();
-        audioStream.src = '';
-        isPlaying = false;
-        playIcon.className = 'fa-solid fa-play';
-        vinylDisc.classList.remove('playing');
-        statusText.textContent = 'Detenido';
-        serverStatusIndicator.className = 'server-status-pill';
-        wakingBanner.classList.add('hidden');
-    }
+            <!-- VISTA 2: PANEL DE GESTIÓN -->
+            <section id="adminView" class="view">
+                <div class="admin-card">
+                    <h3><i class="fa-solid fa-sliders"></i> Gestión de Emisoras</h3>
+                    <p class="desc">Añade o elimina frecuencias del catálogo de la rocola.</p>
 
-    volumeSlider.addEventListener('input', (e) => {
-        audioStream.volume = e.target.value;
-    });
+                    <div class="form-group">
+                        <label for="stationSelect">Emisora Activa</label>
+                        <select id="stationSelect" class="styled-select">
+                            <!-- Dinámico -->
+                        </select>
+                    </div>
 
-    async function checkServerStatus() {
-        serverStatusIndicator.className = 'server-status-pill online';
-        statusText.textContent = 'Rocola Lista';
-        wakingBanner.classList.add('hidden');
-    }
+                    <div class="form-group">
+                        <label for="inputStationName">Nombre de la Emisora</label>
+                        <input type="text" id="inputStationName" placeholder="Ej: Sol Digital Salsa">
+                    </div>
 
-    if (pingServerBtn) {
-        pingServerBtn.addEventListener('click', checkServerStatus);
-    }
-    checkServerStatus();
+                    <div class="form-group">
+                        <label for="inputStreamUrl">URL del Stream (HTTPS obligatorio)</label>
+                        <input type="url" id="inputStreamUrl" placeholder="https://stream.zeno.fm/tu-canal">
+                    </div>
 
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').catch(() => {});
-    }
-});
+                    <div class="admin-actions">
+                        <button id="addStationBtn" class="btn-primary">
+                            <i class="fa-solid fa-plus"></i> Agregar a la Rocola
+                        </button>
+                        <button id="pingServerBtn" class="btn-secondary">
+                            <i class="fa-solid fa-bolt"></i> Testear Rocola
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Barra de Navegación Inferior -->
+        <nav class="bottom-nav">
+            <button class="nav-btn active" data-target="playerView">
+                <i class="fa-solid fa-radio"></i>
+                <span>Rocola</span>
+            </button>
+            <button class="nav-btn" data-target="adminView">
+                <i class="fa-solid fa-gear"></i>
+                <span>Gestión</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <!-- Audio Oculto -->
+    <audio id="audioStream" preload="none"></audio>
+    <script src="app.js"></script>
+</body>
+</html>
