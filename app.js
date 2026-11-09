@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('¡Radio agregada con éxito al Kiosko!');
     });
 
-    // --- CONTROLES DE REPRODUCCIÓN CORREGIDOS Y ACTIVOS ---
+    // Controles de Reproducción
     playPauseBtn.addEventListener('click', () => {
         if (!isPlaying) {
             startPlayback();
