@@ -24,11 +24,21 @@
     <!-- Contenedor General tipo Gabinete de Rocola -->
     <div class="jukebox-cabinet">
         
-        <!-- Pantalla / Cabecera Principal -->
+        <!-- Pantalla / Cabecera con el Sol Radiante y Satélite Animado -->
         <header class="cabinet-header">
-            <div class="brand-title">
-                <h1><i class="fa-solid fa-compact-disc"></i> Sol Digital Radio</h1>
-                <span class="subtitle">Jukebox Center &bull; By EPamar</span>
+            <div class="brand-title-group">
+                <!-- Icono de Sol Radiante con Rayos Giratorios y Satélite -->
+                <div class="solar-logo-container">
+                    <div class="solar-core"></div>
+                    <div class="solar-rays"></div>
+                    <div class="satellite-orbit">
+                        <i class="fa-solid fa-satellite satellite-icon"></i>
+                    </div>
+                </div>
+                <div class="brand-text">
+                    <h1>Sol Digital Radio</h1>
+                    <span class="subtitle">Jukebox Center &bull; By EPamar</span>
+                </div>
             </div>
             <div class="server-status-pill" id="serverStatusIndicator">
                 <span class="dot"></span> <span id="statusText">Rocola Lista</span>
@@ -38,7 +48,7 @@
         <!-- Contenedor Principal (Dashboard PC / Móvil) -->
         <div class="cabinet-main-layout">
             
-            <!-- PANEL IZQUIERDO: Consola de Reproducción (Pantalla de la Rocola) -->
+            <!-- PANEL IZQUIERDO: Consola de Reproducción -->
             <section class="console-screen-panel">
                 <div class="virtual-screen">
                     <div class="screen-header-bar">
@@ -63,7 +73,7 @@
                         </div>
                     </div>
 
-                    <!-- Controles de Reproducción -->
+                    <!-- Controles de Reproducción Reparados -->
                     <div class="screen-controls-deck">
                         <div class="volume-box">
                             <i class="fa-solid fa-volume-low"></i>
