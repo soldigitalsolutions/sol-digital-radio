@@ -43,7 +43,7 @@ body {
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), inset 0 0 25px rgba(252, 209, 22, 0.05);
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: visible; /* Permite que las notas musicales destaquen con elegancia */
     position: relative;
 }
 
@@ -56,38 +56,45 @@ body {
     align-items: center;
 }
 
-/* --- LOGO SOL RADIANTE CON RAYOS Y SATÉLITE --- */
+/* --- LOGO SOL RADIANTE AMPLIADO CON NOTAS MUSICALES Y SATÉLITE --- */
 .brand-title-group {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 15px;
 }
 .solar-logo-container {
-    width: 44px;
-    height: 44px;
+    width: 54px;
+    height: 54px;
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 .solar-core {
-    width: 22px;
-    height: 22px;
+    width: 30px;
+    height: 30px;
     background: linear-gradient(135deg, #FCD116, #f59e0b);
     border-radius: 50%;
-    box-shadow: 0 0 12px var(--colombia-yellow);
+    box-shadow: 0 0 16px var(--colombia-yellow);
+    display: flex;
+    justify-content: center;
+    align-items: center;
     animation: solarBreath 2.5s infinite ease-in-out;
 }
+.core-icon {
+    font-size: 0.75rem;
+    color: #0b0f19;
+}
 @keyframes solarBreath {
-    0%, 100% { transform: scale(0.9); box-shadow: 0 0 8px var(--colombia-yellow); }
-    50% { transform: scale(1.1); box-shadow: 0 0 16px var(--colombia-yellow); }
+    0%, 100% { transform: scale(0.92); box-shadow: 0 0 10px var(--colombia-yellow); }
+    50% { transform: scale(1.08); box-shadow: 0 0 20px var(--colombia-yellow); }
 }
 .solar-rays {
     position: absolute;
-    width: 38px;
-    height: 38px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
-    border: 2px dashed rgba(252, 209, 22, 0.6);
+    border: 2.5px dashed rgba(252, 209, 22, 0.7);
     animation: spinRays 8s linear infinite;
 }
 @keyframes spinRays {
@@ -95,8 +102,8 @@ body {
 }
 .satellite-orbit {
     position: absolute;
-    width: 44px;
-    height: 44px;
+    width: 56px;
+    height: 56px;
     animation: orbitSatellite 4s linear infinite;
 }
 @keyframes orbitSatellite {
@@ -104,12 +111,37 @@ body {
 }
 .satellite-icon {
     position: absolute;
-    top: -2px;
+    top: -3px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 0.6rem;
+    font-size: 0.7rem;
     color: #38bdf8;
-    filter: drop-shadow(0 0 4px #38bdf8);
+    filter: drop-shadow(0 0 5px #38bdf8);
+}
+
+/* Emisión de Notas Musicales Animadas */
+.floating-note {
+    position: absolute;
+    font-size: 0.75rem;
+    color: var(--colombia-yellow);
+    opacity: 0;
+    pointer-events: none;
+}
+.note-1 {
+    animation: floatNote1 3s infinite ease-out;
+}
+.note-2 {
+    animation: floatNote2 3s infinite ease-out 1.5s;
+}
+@keyframes floatNote1 {
+    0% { transform: translate(0, 0) scale(0.6); opacity: 0; }
+    30% { opacity: 0.9; }
+    100% { transform: translate(28px, -28px) scale(1.2); opacity: 0; }
+}
+@keyframes floatNote2 {
+    0% { transform: translate(0, 0) scale(0.6); opacity: 0; }
+    30% { opacity: 0.9; }
+    100% { transform: translate(-28px, -26px) scale(1.2); opacity: 0; }
 }
 
 .brand-text h1 { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); }
