@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sol Digital Radio</title>
+    <title>Sol Digital Radio - Jukebox Center</title>
     
     <!-- PWA Meta Tags -->
     <link rel="manifest" href="manifest.json">
@@ -13,7 +13,7 @@
     <link rel="apple-touch-icon" href="assets/icon-192.png">
 
     <!-- Google Fonts & FontAwesome -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Estilos -->
@@ -21,124 +21,127 @@
 </head>
 <body>
 
-    <!-- Franja de Colores de la Bandera de Colombia -->
-    <div class="colombia-flag-bar">
-        <div class="stripe yellow"></div>
-        <div class="stripe blue"></div>
-        <div class="stripe red"></div>
-    </div>
-
-    <!-- Contenedor Principal -->
-    <div class="app-container">
+    <!-- Contenedor General tipo Gabinete de Rocola -->
+    <div class="jukebox-cabinet">
         
-        <!-- Cabecera -->
-        <header class="app-header">
-            <div class="brand-info">
-                <h1>Sol Digital Radio</h1>
-                <span class="subtitle">by EPamar &bull; Sol Digital Solutions</span>
+        <!-- Pantalla / Cabecera Principal -->
+        <header class="cabinet-header">
+            <div class="brand-title">
+                <h1><i class="fa-solid fa-compact-disc"></i> Sol Digital Radio</h1>
+                <span class="subtitle">Jukebox Center &bull; By EPamar</span>
             </div>
-            <div class="server-status-pill" id="serverStatusIndicator" title="Estado de la Rocola">
-                <span class="dot"></span> <span id="statusText">Verificando...</span>
+            <div class="server-status-pill" id="serverStatusIndicator">
+                <span class="dot"></span> <span id="statusText">Rocola Lista</span>
             </div>
         </header>
 
-        <!-- Notificación Ocultable -->
-        <div id="wakingBanner" class="waking-banner hidden">
-            <i class="fa-solid fa-mug-hot fa-bounce"></i>
-            <div>
-                <strong>Conectando señal...</strong>
-                <p>Estableciendo flujo con el servidor de streaming.</p>
-            </div>
-        </div>
-
-        <!-- Vistas de la Aplicación -->
-        <main class="main-content">
+        <!-- Contenedor Principal (Dashboard Adaptable PC / Móvil) -->
+        <div class="cabinet-main-layout">
             
-            <!-- VISTA 1: REPRODUCTOR / ROCOLA -->
-            <section id="playerView" class="view active">
-                <div class="visualizer-card">
-                    <div class="vinyl-container" id="vinylDisc">
-                        <div class="vinyl-grooves"></div>
-                        <div class="vinyl-label">
-                            <i class="fa-solid fa-compact-disc fa-spin-slow"></i>
+            <!-- PANEL IZQUIERDO: Consola de Reproducción (Pantalla de la Rocola) -->
+            <section class="console-screen-panel">
+                <div class="virtual-screen">
+                    <div class="screen-header-bar">
+                        <span><i class="fa-solid fa-tower-broadcast"></i> EN TRANSMISIÓN</span>
+                        <span class="live-badge-mini"><span class="pulse-dot"></span> LIVE</span>
+                    </div>
+                    
+                    <div class="screen-content">
+                        <!-- Portada / Logo de la Emisora Activa -->
+                        <div class="station-cover-frame" id="stationCoverFrame">
+                            <img id="stationLogoImg" src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&auto=format&fit=crop&q=80" alt="Logo Emisora">
+                            <div class="equalizer-overlay">
+                                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                            </div>
+                        </div>
+
+                        <!-- Información de la Emisora -->
+                        <div class="station-info-display">
+                            <h2 id="currentTrackTitle">Selecciona una Emisora</h2>
+                            <p id="currentTrackCategory">Catálogo Sol Digital</p>
                         </div>
                     </div>
-                    <div class="track-info">
-                        <h2 id="currentTrackTitle">Selecciona una emisora</h2>
-                        <p id="currentTrackArtist">Sol Digital Solutions Jukebox</p>
-                    </div>
-                </div>
 
-                <!-- Kiosko de Emisoras (Botones de Rocola en Pantalla Principal) -->
-                <div class="rocola-section">
-                    <h4><i class="fa-solid fa-compact-disc"></i> Selecciona tu Disco / Emisora:</h4>
-                    <div id="rocolaStationsGrid" class="rocola-grid">
-                        <!-- Se generan dinámicamente con JavaScript -->
-                    </div>
-                </div>
+                    <!-- Controles de Reproducción (Anterior, Play/Pause, Siguiente) -->
+                    <div class="screen-controls-deck">
+                        <div class="volume-box">
+                            <i class="fa-solid fa-volume-low"></i>
+                            <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.8">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </div>
 
-                <div class="player-controls">
-                    <div class="volume-control">
-                        <i class="fa-solid fa-volume-low"></i>
-                        <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.8">
-                        <i class="fa-solid fa-volume-high"></i>
-                    </div>
-                    <button id="playPauseBtn" class="play-btn">
-                        <i class="fa-solid fa-play" id="playIcon"></i>
-                    </button>
-                    <div class="live-badge">
-                        <span class="pulse-dot"></span> EN VIVO
+                        <div class="playback-buttons-group">
+                            <button id="prevBtn" class="deck-btn" title="Emisora Anterior"><i class="fa-solid fa-backward-step"></i></button>
+                            <button id="playPauseBtn" class="deck-btn play-main-btn" title="Reproducir / Pausa">
+                                <i class="fa-solid fa-play" id="playIcon"></i>
+                            </button>
+                            <button id="nextBtn" class="deck-btn" title="Emisora Siguiente"><i class="fa-solid fa-forward-step"></i></button>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <!-- VISTA 2: PANEL DE GESTIÓN -->
-            <section id="adminView" class="view">
-                <div class="admin-card">
-                    <h3><i class="fa-solid fa-sliders"></i> Gestión de Emisoras</h3>
-                    <p class="desc">Añade o elimina frecuencias del catálogo de la rocola.</p>
+            <!-- PANEL DERECHO: Directorio y Selector de Emisoras por Categorías -->
+            <section class="directory-panel">
+                <div class="directory-tabs">
+                    <button class="dir-tab active" data-category="all">Todas</button>
+                    <button class="dir-tab" data-category="colombia">🇨🇴 Colombia</button>
+                    <button class="dir-tab" data-category="internacional">🌍 Internacional</button>
+                    <button class="dir-tab" data-target-view="adminView"><i class="fa-solid fa-plus"></i> Añadir</button>
+                </div>
 
-                    <div class="form-group">
-                        <label for="stationSelect">Emisora Activa</label>
-                        <select id="stationSelect" class="styled-select">
-                            <!-- Dinámico -->
-                        </select>
-                    </div>
+                <!-- Lista de Emisoras en Tarjetas (Grid Visual) -->
+                <div class="stations-catalog-grid" id="stationsCatalogGrid">
+                    <!-- Se inyecta dinámicamente con JS -->
+                </div>
 
-                    <div class="form-group">
-                        <label for="inputStationName">Nombre de la Emisora</label>
-                        <input type="text" id="inputStationName" placeholder="Ej: Sol Digital Salsa">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="inputStreamUrl">URL del Stream (HTTPS obligatorio)</label>
-                        <input type="url" id="inputStreamUrl" placeholder="https://stream.zeno.fm/tu-canal">
-                    </div>
-
-                    <div class="admin-actions">
-                        <button id="addStationBtn" class="btn-primary">
-                            <i class="fa-solid fa-plus"></i> Agregar a la Rocola
-                        </button>
-                        <button id="pingServerBtn" class="btn-secondary">
-                            <i class="fa-solid fa-bolt"></i> Testear Rocola
-                        </button>
+                <!-- Vista de Gestión / Añadir Emisora (Oculta por defecto hasta presionar Añadir) -->
+                <div id="adminViewModal" class="admin-modal hidden">
+                    <div class="admin-card">
+                        <h3><i class="fa-solid fa-plus-circle"></i> Agregar Emisora a la Rocola</h3>
+                        <div class="form-group">
+                            <label>Nombre de la Emisora</label>
+                            <input type="text" id="inputStationName" placeholder="Ej: Tropicana Bogotá">
+                        </div>
+                        <div class="form-group">
+                            <label>Categoría</label>
+                            <select id="inputStationCategory" class="styled-select">
+                                <option value="colombia">Radios de Colombia</option>
+                                <option value="internacional">Radios Internacionales</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>URL del Stream (HTTPS directo)</label>
+                            <input type="url" id="inputStreamUrl" placeholder="https://audio.emisora.com/stream">
+                        </div>
+                        <div class="form-group">
+                            <label>URL de la Portada / Logo (Opcional)</label>
+                            <input type="url" id="inputStationLogo" placeholder="https://imagen.com/logo.png">
+                        </div>
+                        <div class="admin-actions">
+                            <button id="addStationBtn" class="btn-primary">Guardar en la Rocola</button>
+                            <button id="closeModalBtn" class="btn-secondary">Volver</button>
+                        </div>
                     </div>
                 </div>
             </section>
 
-        </main>
+        </div>
 
-        <!-- Barra de Navegación Inferior -->
-        <nav class="bottom-nav">
-            <button class="nav-btn active" data-target="playerView">
-                <i class="fa-solid fa-radio"></i>
-                <span>Rocola</span>
-            </button>
-            <button class="nav-btn" data-target="adminView">
-                <i class="fa-solid fa-gear"></i>
-                <span>Gestión</span>
-            </button>
-        </nav>
+        <!-- Franja Tricolor de Colombia (Ubicación Inferior) -->
+        <div class="colombia-flag-bar">
+            <div class="stripe yellow"></div>
+            <div class="stripe blue"></div>
+            <div class="stripe red"></div>
+        </div>
+
+        <!-- Firma Oficial Inferior -->
+        <footer class="cabinet-footer">
+            <div class="signature-content">
+                <span class="brand-signature">Sol Digital Solutions <span class="by-text">by</span> <span class="epamar-text">EPamar</span></span>
+                <p class="copyright">&copy; 2025 - 2026 &bull; Todos los derechos reservados</p>
+            </div>
+        </footer>
 
     </div>
 
