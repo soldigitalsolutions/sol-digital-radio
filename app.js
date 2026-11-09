@@ -29,10 +29,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Enlaces de audio directo verificados (Streams crudos compatibles con navegadores)
-    let stations = JSON.parse(localStorage.getItem('sol_stations')) || [
-        { name: "Lofi Beats (Prueba Directa)", url: "https://stream.zeno.fm/f3wvbbqmdg8uv" },
-        { name: "Jazz Classics (Prueba Directa)", url: "https://icecast.jazzradio.com/jazz-high.mp3" }
+    // Usamos 'sol_stations_v2' para ignorar la memoria vieja y forzar los streams directos funcionales
+    let stations = JSON.parse(localStorage.getItem('sol_stations_v2')) || [
+        { name: "🎵 Lofi Beats (Prueba Directa)", url: "https://stream.zeno.fm/f3wvbbqmdg8uv" },
+        { name: "🎷 Jazz Classics (Prueba Directa)", url: "https://icecast.jazzradio.com/jazz-high.mp3" }
     ];
 
     let activeStationIndex = 0;
@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         stations.push({ name, url });
-        localStorage.setItem('sol_stations', JSON.stringify(stations));
+        localStorage.setItem('sol_stations_v2', JSON.stringify(stations));
         activeStationIndex = stations.length - 1;
         renderStations();
         updateActiveStationUI();
@@ -119,64 +119,3 @@ document.addEventListener('DOMContentLoaded', () => {
             startPlayback();
         } else {
             stopPlayback();
-        }
-    });
-
-    function startPlayback() {
-        const currentStation = stations[activeStationIndex];
-        currentTrackTitle.textContent = currentStation.name;
-        
-        vinylDisc.classList.remove('jukebox-load');
-        void vinylDisc.offsetWidth;
-        vinylDisc.classList.add('jukebox-load');
-
-        audioStream.src = currentStation.url;
-        
-        wakingBanner.classList.add('hidden');
-        statusText.textContent = 'Conectando...';
-        serverStatusIndicator.className = 'server-status-pill waking';
-
-        audioStream.play().then(() => {
-            isPlaying = true;
-            playIcon.className = 'fa-solid fa-pause';
-            vinylDisc.classList.add('playing');
-            statusText.textContent = 'Reproduciendo';
-            serverStatusIndicator.className = 'server-status-pill online';
-        }).catch(err => {
-            console.error("Error al reproducir:", err);
-            statusText.textContent = 'Error de stream';
-            serverStatusIndicator.className = 'server-status-pill offline';
-            isPlaying = false;
-            playIcon.className = 'fa-solid fa-play';
-            vinylDisc.classList.remove('playing');
-        });
-    }
-
-    function stopPlayback() {
-        audioStream.pause();
-        audioStream.src = '';
-        isPlaying = false;
-        playIcon.className = 'fa-solid fa-play';
-        vinylDisc.classList.remove('playing');
-        statusText.textContent = 'Detenido';
-        serverStatusIndicator.className = 'server-status-pill';
-    }
-
-    volumeSlider.addEventListener('input', (e) => {
-        audioStream.volume = e.target.value;
-    });
-
-    function checkServerStatus() {
-        serverStatusIndicator.className = 'server-status-pill online';
-        statusText.textContent = 'Rocola Lista';
-    }
-
-    if (pingServerBtn) {
-        pingServerBtn.addEventListener('click', checkServerStatus);
-    }
-    checkServerStatus();
-
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').catch(() => {});
-    }
-});
