@@ -35,7 +35,7 @@
             </div>
         </header>
 
-        <!-- Contenedor Principal (Dashboard Adaptable PC / Móvil) -->
+        <!-- Contenedor Principal (Dashboard PC / Móvil) -->
         <div class="cabinet-main-layout">
             
             <!-- PANEL IZQUIERDO: Consola de Reproducción (Pantalla de la Rocola) -->
@@ -59,10 +59,11 @@
                         <div class="station-info-display">
                             <h2 id="currentTrackTitle">Selecciona una Emisora</h2>
                             <p id="currentTrackCategory">Catálogo Sol Digital</p>
+                            <span id="currentGenreBadge" class="genre-tag">Género</span>
                         </div>
                     </div>
 
-                    <!-- Controles de Reproducción (Anterior, Play/Pause, Siguiente) -->
+                    <!-- Controles de Reproducción -->
                     <div class="screen-controls-deck">
                         <div class="volume-box">
                             <i class="fa-solid fa-volume-low"></i>
@@ -79,50 +80,29 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Botón Compartir App y Acceso Oculto a Gestión -->
+                <div class="actions-footer-box">
+                    <button id="shareAppBtn" class="share-app-btn">
+                        <i class="fa-solid fa-share-nodes"></i> Compartir App
+                    </button>
+                    <button id="openAdminModalBtn" class="hidden-admin-trigger">
+                        <i class="fa-solid fa-lock"></i> Gestionar Kiosko
+                    </button>
+                </div>
             </section>
 
-            <!-- PANEL DERECHO: Directorio y Selector de Emisoras por Categorías -->
+            <!-- PANEL DERECHO: Directorio y Selector de Emisoras -->
             <section class="directory-panel">
                 <div class="directory-tabs">
                     <button class="dir-tab active" data-category="all">Todas</button>
                     <button class="dir-tab" data-category="colombia">🇨🇴 Colombia</button>
                     <button class="dir-tab" data-category="internacional">🌍 Internacional</button>
-                    <button class="dir-tab" data-target-view="adminView"><i class="fa-solid fa-plus"></i> Añadir</button>
                 </div>
 
                 <!-- Lista de Emisoras en Tarjetas (Grid Visual) -->
                 <div class="stations-catalog-grid" id="stationsCatalogGrid">
-                    <!-- Se inyecta dinámicamente con JS -->
-                </div>
-
-                <!-- Vista de Gestión / Añadir Emisora (Oculta por defecto hasta presionar Añadir) -->
-                <div id="adminViewModal" class="admin-modal hidden">
-                    <div class="admin-card">
-                        <h3><i class="fa-solid fa-plus-circle"></i> Agregar Emisora a la Rocola</h3>
-                        <div class="form-group">
-                            <label>Nombre de la Emisora</label>
-                            <input type="text" id="inputStationName" placeholder="Ej: Tropicana Bogotá">
-                        </div>
-                        <div class="form-group">
-                            <label>Categoría</label>
-                            <select id="inputStationCategory" class="styled-select">
-                                <option value="colombia">Radios de Colombia</option>
-                                <option value="internacional">Radios Internacionales</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>URL del Stream (HTTPS directo)</label>
-                            <input type="url" id="inputStreamUrl" placeholder="https://audio.emisora.com/stream">
-                        </div>
-                        <div class="form-group">
-                            <label>URL de la Portada / Logo (Opcional)</label>
-                            <input type="url" id="inputStationLogo" placeholder="https://imagen.com/logo.png">
-                        </div>
-                        <div class="admin-actions">
-                            <button id="addStationBtn" class="btn-primary">Guardar en la Rocola</button>
-                            <button id="closeModalBtn" class="btn-secondary">Volver</button>
-                        </div>
-                    </div>
+                    <!-- Dinámico -->
                 </div>
             </section>
 
@@ -143,6 +123,70 @@
             </div>
         </footer>
 
+    </div>
+
+    <!-- MODAL DE GESTIÓN PROTEGIDO POR CONTRASEÑA -->
+    <div id="adminPasswordModal" class="admin-modal hidden">
+        <div class="admin-card auth-box">
+            <h3><i class="fa-solid fa-lock"></i> Seguridad de Kiosko</h3>
+            <p class="desc">Ingresa la contraseña para acceder al panel de administración.</p>
+            <div class="form-group">
+                <input type="password" id="adminPasswordInput" placeholder="Contraseña...">
+            </div>
+            <div class="admin-actions">
+                <button id="submitPasswordBtn" class="btn-primary">Ingresar</button>
+                <button id="cancelPasswordBtn" class="btn-secondary">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANEL DE ADMINISTRACIÓN / GESTOR DE RADIOS -->
+    <div id="adminDashboardModal" class="admin-modal hidden">
+        <div class="admin-dashboard-container">
+            <div class="dashboard-top-bar">
+                <h3><i class="fa-solid fa-sliders"></i> Panel de Gestión de Radios</h3>
+                <button id="closeDashboardBtn" class="close-dash-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="dashboard-grid-split">
+                <!-- Columna Izquierda: Añadir Nueva Radio -->
+                <div class="add-station-form-card">
+                    <h4><i class="fa-solid fa-plus-circle"></i> Nueva Radio</h4>
+                    <div class="form-group">
+                        <label>Nombre</label>
+                        <input type="text" id="inputStationName" placeholder="Ej: Tropicana">
+                    </div>
+                    <div class="form-group">
+                        <label>Nacionalidad</label>
+                        <select id="inputStationCategory" class="styled-select">
+                            <option value="colombia">Colombia (Por defecto)</option>
+                            <option value="internacional">Internacional</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Género Musical</label>
+                        <input type="text" id="inputStationGenre" placeholder="Ej: Salsa / Pop / Vallenato">
+                    </div>
+                    <div class="form-group">
+                        <label>Enlace Stream (HTTPS)</label>
+                        <input type="url" id="inputStreamUrl" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label>Portada URL</label>
+                        <input type="url" id="inputStationLogo" placeholder="https://...">
+                    </div>
+                    <button id="addStationBtn" class="btn-primary full-btn">Agregar al Kiosko</button>
+                </div>
+
+                <!-- Columna Derecha: Configurar y Editar Radios Existentes -->
+                <div class="configure-stations-card">
+                    <h4><i class="fa-solid fa-pen-to-square"></i> Configurar Enlaces y Portadas</h4>
+                    <div id="adminStationsList" class="admin-stations-scroll">
+                        <!-- Generado dinámicamente -->
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Audio Oculto -->
