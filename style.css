@@ -48,29 +48,86 @@ body {
 }
 
 .cabinet-header {
-    padding: 18px 25px;
+    padding: 15px 25px;
     background: linear-gradient(180deg, #1a263d 0%, #131c2e 100%);
     border-bottom: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
-.brand-title h1 { font-size: 1.25rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
-.brand-title h1 i { color: var(--colombia-yellow); }
-.brand-title .subtitle { font-size: 0.75rem; color: var(--text-secondary); letter-spacing: 1px; }
+
+/* --- LOGO SOL RADIANTE CON RAYOS Y SATÉLITE --- */
+.brand-title-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.solar-logo-container {
+    width: 44px;
+    height: 44px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.solar-core {
+    width: 22px;
+    height: 22px;
+    background: linear-gradient(135deg, #FCD116, #f59e0b);
+    border-radius: 50%;
+    box-shadow: 0 0 12px var(--colombia-yellow);
+    animation: solarBreath 2.5s infinite ease-in-out;
+}
+@keyframes solarBreath {
+    0%, 100% { transform: scale(0.9); box-shadow: 0 0 8px var(--colombia-yellow); }
+    50% { transform: scale(1.1); box-shadow: 0 0 16px var(--colombia-yellow); }
+}
+.solar-rays {
+    position: absolute;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 2px dashed rgba(252, 209, 22, 0.6);
+    animation: spinRays 8s linear infinite;
+}
+@keyframes spinRays {
+    100% { transform: rotate(360deg); }
+}
+.satellite-orbit {
+    position: absolute;
+    width: 44px;
+    height: 44px;
+    animation: orbitSatellite 4s linear infinite;
+}
+@keyframes orbitSatellite {
+    100% { transform: rotate(360deg); }
+}
+.satellite-icon {
+    position: absolute;
+    top: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.6rem;
+    color: #38bdf8;
+    filter: drop-shadow(0 0 4px #38bdf8);
+}
+
+.brand-text h1 { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); }
+.brand-text .subtitle { font-size: 0.7rem; color: var(--text-secondary); letter-spacing: 0.5px; }
 
 .server-status-pill {
     display: flex;
     align-items: center;
     gap: 6px;
     background: var(--screen-bg);
-    padding: 6px 14px;
+    padding: 5px 12px;
     border-radius: 20px;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     border: 1px solid var(--border-color);
 }
-.server-status-pill .dot { width: 8px; height: 8px; border-radius: 50%; background-color: #22c55e; box-shadow: 0 0 8px #22c55e; }
+.server-status-pill .dot { width: 7px; height: 7px; border-radius: 50%; background-color: #22c55e; box-shadow: 0 0 8px #22c55e; }
 
+/* Layout Adaptable */
 .cabinet-main-layout {
     display: grid;
     grid-template-columns: 1fr 1.3fr;
@@ -151,14 +208,8 @@ body {
 .station-info-display h2 { font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
 .station-info-display p { font-size: 0.75rem; color: var(--text-secondary); }
 .genre-tag {
-    display: inline-block;
-    margin-top: 6px;
-    background: rgba(252, 209, 22, 0.15);
-    color: var(--colombia-yellow);
-    padding: 2px 10px;
-    border-radius: 10px;
-    font-size: 0.65rem;
-    font-weight: 600;
+    display: inline-block; margin-top: 6px; background: rgba(252, 209, 22, 0.15);
+    color: var(--colombia-yellow); padding: 2px 10px; border-radius: 10px; font-size: 0.65rem; font-weight: 600;
 }
 
 .screen-controls-deck {
@@ -172,14 +223,14 @@ body {
 .deck-btn {
     background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-primary);
     width: 38px; height: 38px; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 0.85rem;
+    transition: all 0.2s;
 }
-.deck-btn:hover { border-color: var(--colombia-yellow); color: var(--colombia-yellow); }
+.deck-btn:hover { border-color: var(--colombia-yellow); color: var(--colombia-yellow); transform: scale(1.05); }
 .play-main-btn {
     width: 50px; height: 50px; background: linear-gradient(135deg, var(--colombia-yellow), #eab308);
     color: #0b0f19; font-size: 1.1rem; border: none; box-shadow: 0 0 15px var(--accent-glow);
 }
 
-/* Botón Compartir y Kiosko Oculto */
 .actions-footer-box {
     display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 5px;
 }
@@ -193,7 +244,7 @@ body {
 }
 .hidden-admin-trigger:hover { opacity: 1; color: var(--colombia-yellow); }
 
-/* Panel Derecho: Directorio */
+/* Directorio */
 .directory-panel {
     display: flex; flex-direction: column; background: var(--screen-bg); border: 2px solid var(--border-color);
     border-radius: 16px; padding: 18px; position: relative; overflow: hidden;
@@ -229,7 +280,6 @@ body {
 .admin-card h3 { font-size: 0.95rem; margin-bottom: 10px; color: var(--colombia-yellow); display: flex; align-items: center; gap: 8px; }
 .admin-card .desc { font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 15px; }
 
-/* Dashboard Avanzado de Gestión */
 .admin-dashboard-container {
     background: var(--cabinet-bg); border: 2px solid var(--border-color); border-radius: 20px;
     width: 100%; max-width: 900px; height: 85vh; display: flex; flex-direction: column; overflow: hidden;
@@ -240,7 +290,6 @@ body {
 }
 .dashboard-top-bar h3 { font-size: 1rem; color: var(--colombia-yellow); display: flex; align-items: center; gap: 8px; }
 .close-dash-btn { background: none; border: none; color: var(--text-secondary); font-size: 1.2rem; cursor: pointer; }
-.close-dash-btn:hover { color: var(--text-primary); }
 
 .dashboard-grid-split {
     display: grid; grid-template-columns: 320px 1fr; gap: 20px; padding: 20px; flex: 1; overflow: hidden;
