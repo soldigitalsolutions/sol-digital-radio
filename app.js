@@ -2,177 +2,196 @@ document.addEventListener('DOMContentLoaded', () => {
     const audioStream = document.getElementById('audioStream');
     const playPauseBtn = document.getElementById('playPauseBtn');
     const playIcon = document.getElementById('playIcon');
-    const vinylDisc = document.getElementById('vinylDisc');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
     const volumeSlider = document.getElementById('volumeSlider');
     const serverStatusIndicator = document.getElementById('serverStatusIndicator');
     const statusText = document.getElementById('statusText');
-    const wakingBanner = document.getElementById('wakingBanner');
     
-    const stationSelect = document.getElementById('stationSelect');
-    const inputStationName = document.getElementById('inputStationName');
-    const inputStreamUrl = document.getElementById('inputStreamUrl');
-    const addStationBtn = document.getElementById('addStationBtn');
     const currentTrackTitle = document.getElementById('currentTrackTitle');
-    const rocolaStationsGrid = document.getElementById('rocolaStationsGrid');
+    const currentTrackCategory = document.getElementById('currentTrackCategory');
+    const stationLogoImg = document.getElementById('stationLogoImg');
+    const stationCoverFrame = document.getElementById('stationCoverFrame');
+    const stationsCatalogGrid = document.getElementById('stationsCatalogGrid');
+    
+    // Elementos del Modal de Añadir
+    const addStationBtn = document.getElementById('addStationBtn');
+    const inputStationName = document.getElementById('inputStationName');
+    const inputStationCategory = document.getElementById('inputStationCategory');
+    const inputStreamUrl = document.getElementById('inputStreamUrl');
+    const inputStationLogo = document.getElementById('inputStationLogo');
+    const adminViewModal = document.getElementById('adminViewModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const dirTabs = document.querySelectorAll('.dir-tab');
 
-    const navButtons = document.querySelectorAll('.nav-btn');
-    const views = document.querySelectorAll('.view');
-
-    navButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            navButtons.forEach(b => b.classList.remove('active'));
-            views.forEach(v => v.classList.remove('active'));
-            btn.classList.add('active');
-            const targetView = document.getElementById(btn.getAttribute('data-target'));
-            if (targetView) targetView.classList.add('active');
-        });
-    });
-
-    // Limpiamos y usamos 'sol_stations_v3' para forzar emisoras de streaming reales y compatibles
-    let stations = [
-        { name: "🎵 Sol Lofi 24/7 (Directo)", url: "https://stream.zeno.fm/f3wvbbqmdg8uv" },
-        { name: "🎷 Jazz Classics Radio", url: "https://icecast.jazzradio.com/jazz-high.mp3" },
-        { name: "🎹 Classical Masterpieces", url: "https://stream.zeno.fm/0r0xa792kwzuv" }
+    // Directorio inicial de emisoras (Colombia e Internacionales con portadas)
+    let stations = JSON.parse(localStorage.getItem('sol_stations_v4')) || [
+        { 
+            name: "Sol Lofi Radio", 
+            category: "colombia", 
+            url: "https://stream.zeno.fm/f3wvbbqmdg8uv", 
+            logo: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&auto=format&fit=crop&q=80" 
+        },
+        { 
+            name: "Jazz Classics", 
+            category: "internacional", 
+            url: "https://icecast.jazzradio.com/jazz-high.mp3", 
+            logo: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=300&auto=format&fit=crop&q=80" 
+        },
+        { 
+            name: "Classical Masterpieces", 
+            category: "internacional", 
+            url: "https://stream.zeno.fm/0r0xa792kwzuv", 
+            logo: "https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=300&auto=format&fit=crop&q=80" 
+        }
     ];
 
-    // Intentar cargar las del usuario si existen
-    const savedStations = localStorage.getItem('sol_stations_v3');
-    if (savedStations) {
-        try {
-            stations = JSON.parse(savedStations);
-        } catch (e) {
-            console.error("Error al leer estaciones guardadas");
-        }
-    }
-
     let activeStationIndex = 0;
+    let currentFilter = 'all';
     let isPlaying = false;
 
-    function renderStations() {
-        if (!stationSelect || !rocolaStationsGrid) return;
+    // Renderizar catálogo de tarjetas con filtro por categoría
+    function renderCatalog() {
+        stationsCatalogGrid.innerHTML = '';
         
-        stationSelect.innerHTML = '';
         stations.forEach((station, index) => {
-            const option = document.createElement('option');
-            option.value = index;
-            option.textContent = station.name;
-            stationSelect.appendChild(option);
-        });
-        stationSelect.value = activeStationIndex;
+            if (currentFilter !== 'all' && station.category !== currentFilter) return;
 
-        rocolaStationsGrid.innerHTML = '';
-        stations.forEach((station, index) => {
-            const btn = document.createElement('button');
-            btn.className = `rocola-station-btn ${index === activeStationIndex ? 'active' : ''}`;
-            btn.innerHTML = `<i class="fa-solid fa-compact-disc"></i> ${station.name}`;
-            btn.addEventListener('click', () => {
+            const card = document.createElement('div');
+            card.className = `station-card-item ${index === activeStationIndex ? 'active' : ''}`;
+            card.innerHTML = `
+                <div class="station-card-thumb">
+                    <img src="${station.logo || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&auto=format&fit=crop&q=80'}" alt="${station.name}">
+                </div>
+                <div class="station-card-title">${station.name}</div>
+                <div class="station-card-cat">${station.category.toUpperCase()}</div>
+            `;
+
+            card.addEventListener('click', () => {
                 activeStationIndex = index;
-                stationSelect.value = index;
-                updateActiveStationUI();
+                updateActiveStation();
                 if (isPlaying) {
                     stopPlayback();
                     startPlayback();
                 } else {
-                    checkServerStatus();
+                    startPlayback();
                 }
             });
-            rocolaStationsGrid.appendChild(btn);
+
+            stationsCatalogGrid.appendChild(card);
         });
     }
 
-    function updateActiveStationUI() {
-        const currentStation = stations[activeStationIndex];
-        if (currentTrackTitle && currentStation) {
-            currentTrackTitle.textContent = currentStation.name;
-        }
-        const buttons = rocolaStationsGrid.querySelectorAll('.rocola-station-btn');
-        buttons.forEach((b, idx) => {
-            if (idx === activeStationIndex) {
-                b.classList.add('active');
-            } else {
-                b.classList.remove('active');
-            }
-        });
+    function updateActiveStation() {
+        const station = stations[activeStationIndex];
+        if (!station) return;
+
+        currentTrackTitle.textContent = station.name;
+        currentTrackCategory.textContent = `Categoría: ${station.category.toUpperCase()}`;
+        stationLogoImg.src = station.logo || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&auto=format&fit=crop&q=80';
+        
+        renderCatalog();
     }
 
-    renderStations();
-
-    if (stationSelect) {
-        stationSelect.addEventListener('change', () => {
-            activeStationIndex = parseInt(stationSelect.value);
-            updateActiveStationUI();
-            if (isPlaying) {
-                stopPlayback();
-                startPlayback();
-            } else {
-                checkServerStatus();
-            }
-        });
-    }
-
-    if (addStationBtn) {
-        addStationBtn.addEventListener('click', () => {
-            const name = inputStationName.value.trim();
-            const url = inputStreamUrl.value.trim();
-
-            if (!name || !url) {
-                alert('Por favor completa el nombre y la URL del stream.');
+    // Filtrado por pestañas
+    dirTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const targetView = tab.getAttribute('data-target-view');
+            if (targetView === 'adminView') {
+                adminViewModal.classList.remove('hidden');
                 return;
             }
 
-            stations.push({ name, url });
-            localStorage.setItem('sol_stations_v3', JSON.stringify(stations));
-            activeStationIndex = stations.length - 1;
-            renderStations();
-            updateActiveStationUI();
-            
-            inputStationName.value = '';
-            inputStreamUrl.value = '';
-            alert('¡Emisora agregada a la rocola con éxito!');
+            dirTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            currentFilter = tab.getAttribute('data-category');
+            renderCatalog();
         });
-    }
+    });
 
-    if (playPauseBtn) {
-        playPauseBtn.addEventListener('click', () => {
-            if (!isPlaying) {
-                startPlayback();
-            } else {
-                stopPlayback();
-            }
-        });
-    }
+    closeModalBtn.addEventListener('click', () => {
+        adminViewModal.classList.add('hidden');
+    });
 
-    function startPlayback() {
-        const currentStation = stations[activeStationIndex];
-        if (!currentStation) return;
-        
-        currentTrackTitle.textContent = currentStation.name;
-        
-        if (vinylDisc) {
-            vinylDisc.classList.remove('jukebox-load');
-            void vinylDisc.offsetWidth;
-            vinylDisc.classList.add('jukebox-load');
+    // Añadir nueva emisora
+    addStationBtn.addEventListener('click', () => {
+        const name = inputStationName.value.trim();
+        const category = inputStationCategory.value;
+        const url = inputStreamUrl.value.trim();
+        const logo = inputStationLogo.value.trim();
+
+        if (!name || !url) {
+            alert('Por favor completa el nombre y la URL del stream.');
+            return;
         }
 
-        audioStream.src = currentStation.url;
+        stations.push({
+            name,
+            category,
+            url,
+            logo: logo || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&auto=format&fit=crop&q=80'
+        });
+
+        localStorage.setItem('sol_stations_v4', JSON.stringify(stations));
+        activeStationIndex = stations.length - 1;
+        adminViewModal.classList.add('hidden');
         
-        if (wakingBanner) wakingBanner.classList.add('hidden');
-        if (statusText) statusText.textContent = 'Conectando...';
-        if (serverStatusIndicator) serverStatusIndicator.className = 'server-status-pill waking';
+        inputStationName.value = '';
+        inputStreamUrl.value = '';
+        inputStationLogo.value = '';
+        
+        renderCatalog();
+        updateActiveStation();
+        alert('¡Emisora agregada con éxito a la rocola!');
+    });
+
+    // Controles de Reproducción (Play/Pause, Anterior, Siguiente)
+    playPauseBtn.addEventListener('click', () => {
+        if (!isPlaying) {
+            startPlayback();
+        } else {
+            stopPlayback();
+        }
+    });
+
+    nextBtn.addEventListener('click', () => {
+        activeStationIndex = (activeStationIndex + 1) % stations.length;
+        updateActiveStation();
+        if (isPlaying) {
+            stopPlayback();
+            startPlayback();
+        }
+    });
+
+    prevBtn.addEventListener('click', () => {
+        activeStationIndex = (activeStationIndex - 1 + stations.length) % stations.length;
+        updateActiveStation();
+        if (isPlaying) {
+            stopPlayback();
+            startPlayback();
+        }
+    });
+
+    function startPlayback() {
+        const station = stations[activeStationIndex];
+        if (!station) return;
+
+        audioStream.src = station.url;
+        statusText.textContent = 'Conectando...';
 
         audioStream.play().then(() => {
             isPlaying = true;
-            if (playIcon) playIcon.className = 'fa-solid fa-pause';
-            if (vinylDisc) vinylDisc.classList.add('playing');
-            if (statusText) statusText.textContent = 'Reproduciendo';
-            if (serverStatusIndicator) serverStatusIndicator.className = 'server-status-pill online';
+            playIcon.className = 'fa-solid fa-pause';
+            stationCoverFrame.classList.add('playing');
+            statusText.textContent = 'Reproduciendo';
+            serverStatusIndicator.style.borderColor = '#22c55e';
         }).catch(err => {
             console.error("Error al reproducir:", err);
-            if (statusText) statusText.textContent = 'Error de stream';
-            if (serverStatusIndicator) serverStatusIndicator.className = 'server-status-pill offline';
+            statusText.textContent = 'Error de stream';
+            serverStatusIndicator.style.borderColor = '#ef4444';
             isPlaying = false;
-            if (playIcon) playIcon.className = 'fa-solid fa-play';
-            if (vinylDisc) vinylDisc.classList.remove('playing');
+            playIcon.className = 'fa-solid fa-play';
+            stationCoverFrame.classList.remove('playing');
         });
     }
 
@@ -180,24 +199,18 @@ document.addEventListener('DOMContentLoaded', () => {
         audioStream.pause();
         audioStream.src = '';
         isPlaying = false;
-        if (playIcon) playIcon.className = 'fa-solid fa-play';
-        if (vinylDisc) vinylDisc.classList.remove('playing');
-        if (statusText) statusText.textContent = 'Detenido';
-        if (serverStatusIndicator) serverStatusIndicator.className = 'server-status-pill';
+        playIcon.className = 'fa-solid fa-play';
+        stationCoverFrame.classList.remove('playing');
+        statusText.textContent = 'Detenido';
     }
 
-    if (volumeSlider) {
-        volumeSlider.addEventListener('input', (e) => {
-            audioStream.volume = e.target.value;
-        });
-    }
+    volumeSlider.addEventListener('input', (e) => {
+        audioStream.volume = e.target.value;
+    });
 
-    function checkServerStatus() {
-        if (serverStatusIndicator) serverStatusIndicator.className = 'server-status-pill online';
-        if (statusText) statusText.textContent = 'Rocola Lista';
-    }
-
-    checkServerStatus();
+    // Inicializar
+    renderCatalog();
+    updateActiveStation();
 
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js').catch(() => {});
