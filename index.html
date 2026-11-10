@@ -98,20 +98,9 @@
                     </div>
                 </div>
 
-                <!-- Visualizador Gráfico de Sonido Multicolor -->
-                <div class="audio-visualizer-bars" id="audioVisualizer">
-                    <span class="v-bar"></span>
-                    <span class="v-bar"></span>
-                    <span class="v-bar"></span>
-                    <span class="v-bar"></span>
-                    <span class="v-bar"></span>
-                    <span class="v-bar"></span>
-                    <span class="v-bar"></span>
-                    <span class="v-bar"></span>
-                    <span class="v-bar"></span>
-                    <span class="v-bar"></span>
-                    <span class="v-bar"></span>
-                    <span class="v-bar"></span>
+                <!-- Visualizador Gráfico de Sonido Avanzado (Canvas en Vivo) BIEN UBICADO ADENTRO -->
+                <div class="audio-visualizer-container">
+                    <canvas id="audioCanvas"></canvas>
                 </div>
             </section>
 
@@ -172,7 +161,7 @@
         </div>
     </div>
 
-    <!-- PANEL DE ADMINISTRACIÓN / GESTOR DE RADIOS (Oculto correctamente con 'hidden') -->
+    <!-- PANEL DE ADMINISTRACIÓN / GESTOR DE RADIOS -->
     <div id="adminDashboardModal" class="admin-modal hidden">
         <div class="admin-dashboard-container">
             <div class="dashboard-top-bar">
@@ -234,7 +223,7 @@
     </div>
 
     <!-- Audio Oculto -->
-    <audio id="audioStream" preload="none"></audio>
+    <audio id="audioStream" preload="none" crossorigin="anonymous"></audio>
     <script src="app.js"></script>
 </body>
 </html>
