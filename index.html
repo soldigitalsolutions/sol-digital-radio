@@ -27,7 +27,6 @@
         <!-- Pantalla / Cabecera con el Sol-Disco y Satélite en Órbita -->
         <header class="cabinet-header">
             <div class="brand-title-group">
-                <!-- Logotipo: Sol-Disco con Órbita, Satélite y Estela Musical -->
                 <div class="solar-logo-container">
                     <div class="solar-core">
                         <div class="solar-rays"></div>
@@ -60,9 +59,12 @@
             <!-- PANEL IZQUIERDO: Consola de Reproducción -->
             <section class="console-screen-panel">
                 <div class="virtual-screen">
+                    <!-- Barra superior de la pantalla virtual con el LIVE dinámico -->
                     <div class="screen-header-bar">
-                        <span><i class="fa-solid fa-tower-broadcast"></i> EN TRANSMISIÓN</span>
-                        <span class="live-badge-mini"><span class="pulse-dot"></span> LIVE</span>
+                        <span class="screen-brand-label">SOL DIGITAL JUKEBOX</span>
+                        <div id="liveBadgeIndicator" class="live-badge-dynamic">
+                            <span class="pulse-dot"></span> LIVE
+                        </div>
                     </div>
                     
                     <div class="screen-content">
@@ -162,7 +164,6 @@
                 <button id="closeDashboardBtn" class="close-dash-btn"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
-            <!-- Sección de Descarga GitHub (Estilo Referencia) -->
             <div class="github-export-banner">
                 <div class="github-export-info">
                     <i class="fa-solid fa-download"></i>
