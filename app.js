@@ -35,16 +35,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const adminStationsList = document.getElementById('adminStationsList');
     const dirTabs = document.querySelectorAll('.dir-tab');
 
-    // Catálogo actualizado con el enlace de Letio para Olímpica Barranquilla
+    // Catálogo de Emisoras
     let stations = JSON.parse(localStorage.getItem('sol_stations_v9')) || [
         { 
             name: "Olímpica Estéreo Barranquilla", 
             category: "colombia", 
             genre: "General",
-            url: "https://playerservices.streamtheworld.com/api/livestream-redirect/OLP_BARRANQUILLAAAC_SC", 
+            url: "https://master.letio.com/io/?gs=9102&type=live.mp3", 
             logo: "https://static.mytuner.mobi/media/tvos_radios/913/olimpica-stereo-barranquilla-921-fm.a7f8c4c5.png" 
         },
-         { 
+        { 
             name: "rm.fm", 
             category: "alemania", 
             genre: "top100-djcharts",
@@ -63,6 +63,83 @@ document.addEventListener('DOMContentLoaded', () => {
     let activeStationIndex = 0;
     let currentFilter = 'all';
     let isPlaying = false;
+
+    // --- CONFIGURACIÓN DEL VISUALIZADOR DE AUDIO (WEB AUDIO API + CANVAS) ---
+    let audioCtx = null;
+    let analyser = null;
+    let sourceNode = null;
+    const canvas = document.getElementById('audioCanvas');
+    const canvasCtx = canvas ? canvas.getContext('2d') : null;
+
+    function initAudioVisualizer() {
+        if (!canvas || audioCtx) return;
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+            analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 64;
+            
+            sourceNode = audioCtx.createMediaElementSource(audioStream);
+            sourceNode.connect(analyser);
+            analyser.connect(audioCtx.destination);
+        } catch (e) {
+            console.log("Visualizador en modo dinámico alternativo.");
+        }
+    }
+
+    function drawVisualizer() {
+        if (!canvas || !canvasCtx) return;
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+        
+        const width = canvas.width;
+        const height = canvas.height;
+        canvasCtx.clearRect(0, 0, width, height);
+
+        let freqData = new Uint8Array(analyser ? analyser.frequencyBinCount : 16);
+
+        if (isPlaying) {
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            if (analyser) {
+                analyser.getByteFrequencyData(freqData);
+            } else {
+                for (let i = 0; i < freqData.length; i++) {
+                    freqData[i] = Math.abs(Math.sin(Date.now() / 150 + i) * 160 + Math.random() * 60);
+                }
+            }
+
+            const barWidth = (width / freqData.length) * 1.8;
+            let x = 0;
+
+            for (let i = 0; i < freqData.length; i++) {
+                const barHeight = (freqData[i] / 255) * height * 0.95;
+                
+                let gradient = canvasCtx.createLinearGradient(0, height, 0, 0);
+                gradient.addColorStop(0, '#FCD116');
+                gradient.addColorStop(0.5, '#38bdf8');
+                gradient.addColorStop(1, '#a855f7');
+
+                canvasCtx.fillStyle = gradient;
+                canvasCtx.shadowBlur = 10;
+                canvasCtx.shadowColor = '#FCD116';
+                canvasCtx.fillRect(x, height - barHeight, barWidth - 2, barHeight);
+
+                x += barWidth + 2;
+            }
+        } else {
+            canvasCtx.fillStyle = '#2a3b5c';
+            canvasCtx.shadowBlur = 0;
+            canvasCtx.fillRect(0, height / 2 - 1, width, 2);
+        }
+        requestAnimationFrame(drawVisualizer);
+    }
+
+    if (canvas) {
+        drawVisualizer();
+    }
 
     function renderCatalog() {
         stationsCatalogGrid.innerHTML = '';
@@ -122,6 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <label>Nacionalidad</label>
                         <select class="styled-select edit-cat" data-index="${index}">
                             <option value="colombia" ${station.category === 'colombia' ? 'selected' : ''}>Colombia</option>
+                            <option value="alemania" ${station.category === 'alemania' ? 'selected' : ''}>Alemania</option>
                             <option value="internacional" ${station.category === 'internacional' ? 'selected' : ''}>Internacional</option>
                         </select>
                     </div>
@@ -218,14 +296,12 @@ document.addEventListener('DOMContentLoaded', () => {
         adminDashboardModal.classList.add('hidden');
     });
 
-    // Limpieza inteligente antes de descargar el archivo para GitHub
     downloadIndexBtn.addEventListener('click', () => {
         adminDashboardModal.classList.add('hidden');
         adminPasswordModal.classList.add('hidden');
         adminStationsList.innerHTML = ''; 
 
         const htmlContent = document.documentElement.outerHTML;
-        
         renderAdminList();
 
         const blob = new Blob([htmlContent], { type: 'text/html' });
@@ -300,6 +376,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const station = stations[activeStationIndex];
         if (!station) return;
 
+        audioStream.crossOrigin = "anonymous";
         audioStream.src = station.url;
         statusText.textContent = 'Conectando...';
 
@@ -310,6 +387,11 @@ document.addEventListener('DOMContentLoaded', () => {
             statusText.textContent = 'En Sintonía';
             serverStatusIndicator.style.borderColor = '#22c55e';
             liveBadgeIndicator.classList.add('active');
+            
+            initAudioVisualizer();
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
         }).catch(err => {
             console.error("Error al reproducir:", err);
             statusText.textContent = 'Error de stream';
