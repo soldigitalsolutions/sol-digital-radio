@@ -189,7 +189,6 @@ body {
 }
 .server-status-pill .dot { width: 7px; height: 7px; border-radius: 50%; background-color: #22c55e; box-shadow: 0 0 8px #22c55e; }
 
-/* Layout Adaptable */
 .cabinet-main-layout {
     display: grid;
     grid-template-columns: 1fr 1.3fr;
@@ -217,7 +216,7 @@ body {
 }
 .screen-header-bar {
     display: flex;
-    justify-content: flex-end; /* Alinea el indicador LIVE perfectamente a la derecha */
+    justify-content: flex-end;
     align-items: center;
     font-size: 0.7rem;
     color: var(--text-secondary);
@@ -225,13 +224,7 @@ body {
     padding-bottom: 8px;
     margin-bottom: 15px;
 }
-.screen-brand-label {
-    letter-spacing: 1px;
-    font-weight: 600;
-    color: var(--text-secondary);
-}
 
-/* --- LIVE DINÁMICO (Activo / Inactivo) --- */
 .live-badge-dynamic {
     background: rgba(100, 116, 139, 0.2);
     color: #64748b;
@@ -248,8 +241,6 @@ body {
 .live-badge-dynamic .pulse-dot {
     width: 6px; height: 6px; background-color: #64748b; border-radius: 50%;
 }
-
-/* Estado Activo (Reproduciendo) */
 .live-badge-dynamic.active {
     background: rgba(206, 17, 38, 0.25);
     color: #fca5a5;
@@ -266,7 +257,6 @@ body {
     100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(206, 17, 38, 0); }
 }
 
-/* Marco de la Portada con efecto respirando al reproducir */
 .station-cover-frame {
     width: 100%;
     height: 160px;
@@ -345,7 +335,6 @@ body {
 }
 .hidden-admin-trigger:hover { opacity: 1; color: var(--colombia-yellow); }
 
-/* Directorio */
 .directory-panel {
     display: flex; flex-direction: column; background: var(--screen-bg); border: 2px solid var(--border-color);
     border-radius: 16px; padding: 18px; position: relative; overflow: hidden;
@@ -371,7 +360,6 @@ body {
 .station-card-title { font-size: 0.75rem; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
 .station-card-genre { font-size: 0.65rem; color: var(--colombia-yellow); }
 
-/* Modales */
 .admin-modal {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(7, 10, 18, 0.9);
     display: flex; justify-content: center; align-items: center; padding: 15px; z-index: 2000;
@@ -392,7 +380,6 @@ body {
 .dashboard-top-bar h3 { font-size: 1rem; color: var(--colombia-yellow); display: flex; align-items: center; gap: 8px; }
 .close-dash-btn { background: none; border: none; color: var(--text-secondary); font-size: 1.2rem; cursor: pointer; }
 
-/* Banner Descarga GitHub */
 .github-export-banner {
     background: var(--screen-bg);
     border: 1px dashed rgba(252, 209, 22, 0.4);
@@ -462,7 +449,6 @@ body {
 .admin-station-name { font-size: 0.8rem; font-weight: 600; color: var(--text-primary); }
 .admin-station-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 
-/* Franja y Footer */
 .colombia-flag-bar { width: 100%; height: 14px; display: flex; }
 .stripe { height: 100%; flex: 1; }
 .stripe.yellow { background-color: var(--colombia-yellow); flex: 2; }
