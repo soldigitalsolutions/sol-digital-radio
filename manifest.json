@@ -1,11 +1,11 @@
 {
-  "name": "Sol Digital Radio by EPamar",
+  "name": "Sol Digital Radio",
   "short_name": "Sol Radio",
   "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#0f172a",
+  "background_color": "#0b0f19",
   "theme_color": "#FCD116",
-  "orientation": "portrait",
+  "description": "Rocola Digital de Sol Digital Solutions by EPamar",
   "icons": [
     {
       "src": "assets/icon-192.png",
