@@ -56,7 +56,6 @@ body {
     align-items: center;
 }
 
-/* Título Moderno y Elegante */
 .brand-title-group {
     display: flex;
     align-items: center;
@@ -157,7 +156,6 @@ body {
     100% { transform: translate(-20px, -6px) scale(0.9); opacity: 0; }
 }
 
-/* Estilo Moderno del Título */
 .modern-title {
     font-family: 'Playfair Display', serif;
     font-size: 1.35rem;
@@ -227,19 +225,48 @@ body {
     padding-bottom: 8px;
     margin-bottom: 15px;
 }
-.live-badge-mini {
-    background: rgba(206, 17, 38, 0.2);
-    color: #fca5a5;
-    padding: 2px 8px;
-    border-radius: 8px;
+.screen-brand-label {
+    letter-spacing: 1px;
     font-weight: 600;
+    color: var(--text-secondary);
+}
+
+/* --- LIVE DINÁMICO (Activo / Inactivo) --- */
+.live-badge-dynamic {
+    background: rgba(100, 116, 139, 0.2);
+    color: #64748b;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-size: 0.68rem;
+    font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
+    border: 1px solid rgba(100, 116, 139, 0.3);
+    transition: all 0.3s ease;
 }
-.pulse-dot { width: 6px; height: 6px; background-color: var(--colombia-red); border-radius: 50%; animation: pulse 1.5s infinite; }
-@keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.6); opacity: 0.4; } 100% { transform: scale(1); opacity: 1; } }
+.live-badge-dynamic .pulse-dot {
+    width: 6px; height: 6px; background-color: #64748b; border-radius: 50%;
+}
 
+/* Estado Activo (Reproduciendo) */
+.live-badge-dynamic.active {
+    background: rgba(206, 17, 38, 0.25);
+    color: #fca5a5;
+    border-color: rgba(206, 17, 38, 0.5);
+    box-shadow: 0 0 10px rgba(206, 17, 38, 0.4);
+}
+.live-badge-dynamic.active .pulse-dot {
+    background-color: var(--colombia-red);
+    animation: livePulse 1.2s infinite;
+}
+@keyframes livePulse {
+    0% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(206, 17, 38, 0.7); }
+    70% { transform: scale(1.5); opacity: 0.6; box-shadow: 0 0 0 6px rgba(206, 17, 38, 0); }
+    100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(206, 17, 38, 0); }
+}
+
+/* Marco de la Portada con efecto respirando al reproducir */
 .station-cover-frame {
     width: 100%;
     height: 160px;
@@ -251,8 +278,18 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    transition: box-shadow 0.3s ease;
 }
 .station-cover-frame img { width: 100%; height: 100%; object-fit: cover; }
+.station-cover-frame.playing {
+    border-color: var(--colombia-yellow);
+    box-shadow: 0 0 15px rgba(252, 209, 22, 0.25);
+    animation: frameBreath 3s infinite ease-in-out;
+}
+@keyframes frameBreath {
+    0%, 100% { box-shadow: 0 0 10px rgba(252, 209, 22, 0.2); }
+    50% { box-shadow: 0 0 20px rgba(252, 209, 22, 0.4); }
+}
 
 .equalizer-overlay {
     position: absolute; bottom: 10px; right: 10px;
@@ -355,7 +392,7 @@ body {
 .dashboard-top-bar h3 { font-size: 1rem; color: var(--colombia-yellow); display: flex; align-items: center; gap: 8px; }
 .close-dash-btn { background: none; border: none; color: var(--text-secondary); font-size: 1.2rem; cursor: pointer; }
 
-/* Banner Descarga GitHub (Estilo Referencia) */
+/* Banner Descarga GitHub */
 .github-export-banner {
     background: var(--screen-bg);
     border: 1px dashed rgba(252, 209, 22, 0.4);
