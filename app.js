@@ -35,8 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const adminStationsList = document.getElementById('adminStationsList');
     const dirTabs = document.querySelectorAll('.dir-tab');
 
-    // Catálogo con enlaces probados
-    let stations = JSON.parse(localStorage.getItem('sol_stations_v7')) || [
+    // Catálogo actualizado con el enlace de Letio para Olímpica Barranquilla
+    let stations = JSON.parse(localStorage.getItem('sol_stations_v9')) || [
         { 
             name: "Sol Lofi Radio", 
             category: "colombia", 
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
             name: "Olímpica Estéreo Barranquilla", 
             category: "colombia", 
             genre: "General",
-            url: "https://playerservices.streamtheworld.com/api/livestream-redirect/OLIMPICA_BAAEC.aac?dist=oro_web", 
+            url: "https://master.letio.com/io/?gs=9102&type=live.mp3", 
             logo: "https://static.mytuner.mobi/media/tvos_radios/913/olimpica-stereo-barranquilla-921-fm.a7f8c4c5.png" 
         },
         { 
@@ -152,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 stations[idx].url = adminStationsList.querySelector(`.edit-url[data-index="${idx}"]`).value;
                 stations[idx].logo = adminStationsList.querySelector(`.edit-logo[data-index="${idx}"]`).value;
 
-                localStorage.setItem('sol_stations_v7', JSON.stringify(stations));
+                localStorage.setItem('sol_stations_v9', JSON.stringify(stations));
                 renderCatalog();
                 updateActiveStation();
                 alert('¡Radio actualizada con éxito!');
@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const idx = e.currentTarget.getAttribute('data-index');
                 if (confirm(`¿Eliminar la radio "${stations[idx].name}"?`)) {
                     stations.splice(idx, 1);
-                    localStorage.setItem('sol_stations_v7', JSON.stringify(stations));
+                    localStorage.setItem('sol_stations_v9', JSON.stringify(stations));
                     renderCatalog();
                     updateActiveStation();
                     renderAdminList();
@@ -218,8 +218,16 @@ document.addEventListener('DOMContentLoaded', () => {
         adminDashboardModal.classList.add('hidden');
     });
 
+    // Limpieza inteligente antes de descargar el archivo para GitHub
     downloadIndexBtn.addEventListener('click', () => {
+        adminDashboardModal.classList.add('hidden');
+        adminPasswordModal.classList.add('hidden');
+        adminStationsList.innerHTML = ''; 
+
         const htmlContent = document.documentElement.outerHTML;
+        
+        renderAdminList();
+
         const blob = new Blob([htmlContent], { type: 'text/html' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -229,7 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        alert('¡Archivo index.html descargado con éxito para subir a GitHub!');
+        alert('¡Archivo index.html descargado limpio y listo para GitHub!');
     });
 
     addStationBtn.addEventListener('click', () => {
@@ -252,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
             logo: logo || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&auto=format&fit=crop&q=80'
         });
 
-        localStorage.setItem('sol_stations_v7', JSON.stringify(stations));
+        localStorage.setItem('sol_stations_v9', JSON.stringify(stations));
         activeStationIndex = stations.length - 1;
         
         inputStationName.value = '';
