@@ -323,48 +323,25 @@ body {
     color: #0b0f19; font-size: 1.1rem; border: none; box-shadow: 0 0 15px var(--accent-glow);
 }
 
-/* --- VISUALIZADOR GRÁFICO DE SONIDO MULTICOLOR --- */
-.audio-visualizer-bars {
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    gap: 5px;
-    height: 30px;
+/* --- VISUALIZADOR GRÁFICO DE SONIDO (CANVAS EN VIVO) --- */
+.audio-visualizer-container {
+    width: 100%;
+    height: 48px;
     background: var(--screen-bg);
     border: 1px solid var(--border-color);
     border-radius: 12px;
-    padding: 6px 12px;
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+    margin-top: 12px;
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.9);
     overflow: hidden;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
-.v-bar {
-    width: 4px;
-    height: 6px;
-    background-color: var(--text-secondary);
-    border-radius: 3px;
-    transition: height 0.2s ease;
-}
-.station-cover-frame.playing ~ .audio-visualizer-bars .v-bar,
-.console-screen-panel:has(.station-cover-frame.playing) .audio-visualizer-bars .v-bar {
-    animation: soundWave 0.8s infinite alternate ease-in-out;
-}
-
-.v-bar:nth-child(1) { background-color: #FCD116; animation-delay: 0.1s; }
-.v-bar:nth-child(2) { background-color: #38bdf8; animation-delay: 0.3s; }
-.v-bar:nth-child(3) { background-color: #22c55e; animation-delay: 0.2s; }
-.v-bar:nth-child(4) { background-color: #CE1126; animation-delay: 0.5s; }
-.v-bar:nth-child(5) { background-color: #a855f7; animation-delay: 0.15s; }
-.v-bar:nth-child(6) { background-color: #FCD116; animation-delay: 0.4s; }
-.v-bar:nth-child(7) { background-color: #38bdf8; animation-delay: 0.25s; }
-.v-bar:nth-child(8) { background-color: #22c55e; animation-delay: 0.45s; }
-.v-bar:nth-child(9) { background-color: #CE1126; animation-delay: 0.35s; }
-.v-bar:nth-child(10) { background-color: #a855f7; animation-delay: 0.05s; }
-.v-bar:nth-child(11) { background-color: #FCD116; animation-delay: 0.2s; }
-.v-bar:nth-child(12) { background-color: #38bdf8; animation-delay: 0.5s; }
-
-@keyframes soundWave {
-    0% { height: 6px; opacity: 0.4; }
-    100% { height: 22px; opacity: 1; filter: drop-shadow(0 0 6px currentColor); }
+#audioCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
 }
 
 /* Directorio */
