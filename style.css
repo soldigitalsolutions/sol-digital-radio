@@ -217,7 +217,7 @@ body {
 }
 .screen-header-bar {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end; /* Alinea el indicador LIVE perfectamente a la derecha */
     align-items: center;
     font-size: 0.7rem;
     color: var(--text-secondary);
