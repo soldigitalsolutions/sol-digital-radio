@@ -38,18 +38,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Catálogo actualizado con el enlace de Letio para Olímpica Barranquilla
     let stations = JSON.parse(localStorage.getItem('sol_stations_v9')) || [
         { 
-            name: "Sol Lofi Radio", 
-            category: "colombia", 
-            genre: "Lofi / Chill",
-            url: "https://stream.zeno.fm/f3wvbbqmdg8uv", 
-            logo: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&auto=format&fit=crop&q=80" 
-        },
-        { 
             name: "Olímpica Estéreo Barranquilla", 
             category: "colombia", 
             genre: "General",
             url: "https://playerservices.streamtheworld.com/api/livestream-redirect/OLP_BARRANQUILLAAAC_SC", 
             logo: "https://static.mytuner.mobi/media/tvos_radios/913/olimpica-stereo-barranquilla-921-fm.a7f8c4c5.png" 
+        },
+         { 
+            name: "rm.fm", 
+            category: "alemania", 
+            genre: "top100-djcharts",
+            url: "https://breakz-high.rautemusik.fm/?ref=radiobrowser-top100-djcharts", 
+            logo: "https://i.postimg.cc/fRh4n4hg/Captura-de-pantalla-2026-11-09-232403.png" 
         },
         { 
             name: "Mix 103.9 Barranquilla", 
