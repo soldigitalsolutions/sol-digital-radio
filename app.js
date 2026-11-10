@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentFilter = 'all';
     let isPlaying = false;
 
-    // --- CONFIGURACIÓN DEL VISUALIZADOR DE AUDIO (WEB AUDIO API + CANVAS) ---
+    // --- CONFIGURACIÓN DEL VISUALIZADOR DE AUDIO (HÍBRIDO INTELIGENTE EN VIVO) ---
     let audioCtx = null;
     let analyser = null;
     let sourceNode = null;
@@ -72,16 +72,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const canvasCtx = canvas ? canvas.getContext('2d') : null;
 
     function initAudioVisualizer() {
-        if (!canvas || audioCtx) return;
+        if (!canvas) return;
         try {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            audioCtx = new AudioContext();
-            analyser = audioCtx.createAnalyser();
-            analyser.fftSize = 64;
-            
-            sourceNode = audioCtx.createMediaElementSource(audioStream);
-            sourceNode.connect(analyser);
-            analyser.connect(audioCtx.destination);
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 64;
+                
+                sourceNode = audioCtx.createMediaElementSource(audioStream);
+                sourceNode.connect(analyser);
+                analyser.connect(audioCtx.destination);
+            }
         } catch (e) {
             console.log("Visualizador en modo dinámico alternativo.");
         }
@@ -96,18 +98,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const height = canvas.height;
         canvasCtx.clearRect(0, 0, width, height);
 
-        let freqData = new Uint8Array(analyser ? analyser.frequencyBinCount : 16);
+        let freqData = new Uint8Array(analyser ? analyser.frequencyBinCount : 32);
 
         if (isPlaying) {
             if (audioCtx && audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
 
+            let hasRealData = false;
             if (analyser) {
-                analyser.getByteFrequencyData(freqData);
-            } else {
+                try {
+                    analyser.getByteFrequencyData(freqData);
+                    hasRealData = freqData.some(val => val > 0);
+                } catch (err) {
+                    hasRealData = false;
+                }
+            }
+
+            // Sistema inteligente: si el stream protege CORS, genera ondas espectrales fluidas y orgánicas sincronizadas
+            if (!hasRealData) {
                 for (let i = 0; i < freqData.length; i++) {
-                    freqData[i] = Math.abs(Math.sin(Date.now() / 150 + i) * 160 + Math.random() * 60);
+                    let wave = Math.sin(Date.now() / 120 + (i * 0.4)) * 110 + 70;
+                    let noise = Math.random() * 50;
+                    freqData[i] = Math.min(255, Math.abs(wave + noise));
                 }
             }
 
@@ -118,18 +131,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 const barHeight = (freqData[i] / 255) * height * 0.95;
                 
                 let gradient = canvasCtx.createLinearGradient(0, height, 0, 0);
-                gradient.addColorStop(0, '#FCD116');
-                gradient.addColorStop(0.5, '#38bdf8');
-                gradient.addColorStop(1, '#a855f7');
+                gradient.addColorStop(0, '#FCD116'); // Amarillo Colombia
+                gradient.addColorStop(0.5, '#38bdf8'); // Azul Cielo
+                gradient.addColorStop(1, '#a855f7'); // Violeta Neón
 
                 canvasCtx.fillStyle = gradient;
-                canvasCtx.shadowBlur = 10;
+                canvasCtx.shadowBlur = 12;
                 canvasCtx.shadowColor = '#FCD116';
                 canvasCtx.fillRect(x, height - barHeight, barWidth - 2, barHeight);
 
                 x += barWidth + 2;
             }
         } else {
+            // Línea de descanso elegante cuando está pausado
             canvasCtx.fillStyle = '#2a3b5c';
             canvasCtx.shadowBlur = 0;
             canvasCtx.fillRect(0, height / 2 - 1, width, 2);
