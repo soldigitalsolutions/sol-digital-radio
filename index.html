@@ -21,7 +21,7 @@
 </head>
 <body>
 
-    <!-- Contenedor General tipo Gabinete de Rocola (Único y limpio) -->
+    <!-- Contenedor General tipo Gabinete de Rocola -->
     <div class="jukebox-cabinet">
         
         <!-- Pantalla / Cabecera con el Sol-Disco y Satélite en Órbita -->
@@ -98,14 +98,20 @@
                     </div>
                 </div>
 
-                <!-- Botones de Compartir y Gestionar Radios ABAJO de la consola -->
-                <div class="actions-footer-box-bottom">
-                    <button id="shareAppBtn" class="share-app-btn-compact">
-                        <i class="fa-solid fa-share-nodes"></i> Compartir App
-                    </button>
-                    <button id="openAdminModalBtn" class="hidden-admin-trigger-bottom">
-                        <i class="fa-solid fa-lock"></i> Gestionar Radios
-                    </button>
+                <!-- NUEVO: Visualizador Gráfico de Sonido Multicolor debajo de la consola -->
+                <div class="audio-visualizer-bars" id="audioVisualizer">
+                    <span class="v-bar"></span>
+                    <span class="v-bar"></span>
+                    <span class="v-bar"></span>
+                    <span class="v-bar"></span>
+                    <span class="v-bar"></span>
+                    <span class="v-bar"></span>
+                    <span class="v-bar"></span>
+                    <span class="v-bar"></span>
+                    <span class="v-bar"></span>
+                    <span class="v-bar"></span>
+                    <span class="v-bar"></span>
+                    <span class="v-bar"></span>
                 </div>
             </section>
 
@@ -118,10 +124,20 @@
                 </div>
 
                 <div class="stations-catalog-grid" id="stationsCatalogGrid">
-                    <!-- Dinámico generado por tu app.js -->
+                    <!-- Dinámico -->
                 </div>
             </section>
 
+        </div>
+
+        <!-- ZONA INFERIOR: Botones de Compartir y Gestionar Radios reubicados limpiamente aquí -->
+        <div class="cabinet-global-actions-bar">
+            <button id="shareAppBtn" class="share-app-btn-global">
+                <i class="fa-solid fa-share-nodes"></i> Compartir App
+            </button>
+            <button id="openAdminModalBtn" class="hidden-admin-trigger-global">
+                <i class="fa-solid fa-lock"></i> Gestionar Radios
+            </button>
         </div>
 
         <!-- Franja Tricolor de Colombia -->
