@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const stationLogoImg = document.getElementById('stationLogoImg');
     const stationCoverFrame = document.getElementById('stationCoverFrame');
     const stationsCatalogGrid = document.getElementById('stationsCatalogGrid');
+    const liveBadgeIndicator = document.getElementById('liveBadgeIndicator');
     
     // Elementos Compartir y Gestión
     const shareAppBtn = document.getElementById('shareAppBtn');
@@ -221,7 +222,6 @@ document.addEventListener('DOMContentLoaded', () => {
         adminDashboardModal.classList.add('hidden');
     });
 
-    // Función para descargar el index.html actualizado para GitHub
     downloadIndexBtn.addEventListener('click', () => {
         const htmlContent = document.documentElement.outerHTML;
         const blob = new Blob([htmlContent], { type: 'text/html' });
@@ -270,7 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('¡Radio agregada con éxito al Kiosko!');
     });
 
-    // Controles de Reproducción
+    // Controles de Reproducción con control del LIVE dinámico
     playPauseBtn.addEventListener('click', () => {
         if (!isPlaying) {
             startPlayback();
@@ -304,8 +304,11 @@ document.addEventListener('DOMContentLoaded', () => {
             isPlaying = true;
             playIcon.className = 'fa-solid fa-pause';
             stationCoverFrame.classList.add('playing');
-            statusText.textContent = 'Reproduciendo';
+            statusText.textContent = 'En Sintonía';
             serverStatusIndicator.style.borderColor = '#22c55e';
+            
+            // Activar indicador LIVE dinámico y respiración
+            liveBadgeIndicator.classList.add('active');
         }).catch(err => {
             console.error("Error al reproducir:", err);
             statusText.textContent = 'Error de stream';
@@ -313,6 +316,9 @@ document.addEventListener('DOMContentLoaded', () => {
             isPlaying = false;
             playIcon.className = 'fa-solid fa-play';
             stationCoverFrame.classList.remove('playing');
+            
+            // Apagar indicador LIVE dinámico
+            liveBadgeIndicator.classList.remove('active');
         });
     }
 
@@ -323,6 +329,9 @@ document.addEventListener('DOMContentLoaded', () => {
         playIcon.className = 'fa-solid fa-play';
         stationCoverFrame.classList.remove('playing');
         statusText.textContent = 'Detenido';
+        
+        // Apagar indicador LIVE dinámico
+        liveBadgeIndicator.classList.remove('active');
     }
 
     volumeSlider.addEventListener('input', (e) => {
