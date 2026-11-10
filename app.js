@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const stationsCatalogGrid = document.getElementById('stationsCatalogGrid');
     const liveBadgeIndicator = document.getElementById('liveBadgeIndicator');
     
-    // Elementos Compartir y Gestión
     const shareAppBtn = document.getElementById('shareAppBtn');
     const openAdminModalBtn = document.getElementById('openAdminModalBtn');
     const adminPasswordModal = document.getElementById('adminPasswordModal');
@@ -24,7 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const submitPasswordBtn = document.getElementById('submitPasswordBtn');
     const cancelPasswordBtn = document.getElementById('cancelPasswordBtn');
     
-    // Panel Dashboard
     const adminDashboardModal = document.getElementById('adminDashboardModal');
     const closeDashboardBtn = document.getElementById('closeDashboardBtn');
     const downloadIndexBtn = document.getElementById('downloadIndexBtn');
@@ -37,8 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const adminStationsList = document.getElementById('adminStationsList');
     const dirTabs = document.querySelectorAll('.dir-tab');
 
-    // Catálogo por defecto
-    let stations = JSON.parse(localStorage.getItem('sol_stations_v6')) || [
+    // Catálogo con enlaces probados
+    let stations = JSON.parse(localStorage.getItem('sol_stations_v7')) || [
         { 
             name: "Sol Lofi Radio", 
             category: "colombia", 
@@ -47,18 +45,18 @@ document.addEventListener('DOMContentLoaded', () => {
             logo: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&auto=format&fit=crop&q=80" 
         },
         { 
-            name: "Jazz Classics", 
-            category: "internacional", 
-            genre: "Jazz / Instrumental",
-            url: "https://icecast.jazzradio.com/jazz-high.mp3", 
-            logo: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=300&auto=format&fit=crop&q=80" 
+            name: "Olímpica Estéreo Barranquilla", 
+            category: "colombia", 
+            genre: "General",
+            url: "https://playerservices.streamtheworld.com/api/livestream-redirect/OLIMPICA_BAAEC.aac?dist=oro_web", 
+            logo: "https://static.mytuner.mobi/media/tvos_radios/913/olimpica-stereo-barranquilla-921-fm.a7f8c4c5.png" 
         },
         { 
-            name: "Classical Masterpieces", 
-            category: "internacional", 
-            genre: "Clásica",
-            url: "https://stream.zeno.fm/0r0xa792kwzuv", 
-            logo: "https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=300&auto=format&fit=crop&q=80" 
+            name: "Mix 103.9 Barranquilla", 
+            category: "colombia", 
+            genre: "General",
+            url: "https://playerservices.streamtheworld.com/api/livestream-redirect/MIX_BARRANQUILLAAAC.aac?dist=oro_web", 
+            logo: "https://static.mytuner.mobi/media/tvos_radios/577/mix-1039-fm.664b9586.jpg" 
         }
     ];
 
@@ -66,7 +64,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentFilter = 'all';
     let isPlaying = false;
 
-    // Renderizar Directorio Principal
     function renderCatalog() {
         stationsCatalogGrid.innerHTML = '';
         
@@ -105,7 +102,6 @@ document.addEventListener('DOMContentLoaded', () => {
         renderCatalog();
     }
 
-    // Renderizar Panel de Administración
     function renderAdminList() {
         adminStationsList.innerHTML = '';
         
@@ -156,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 stations[idx].url = adminStationsList.querySelector(`.edit-url[data-index="${idx}"]`).value;
                 stations[idx].logo = adminStationsList.querySelector(`.edit-logo[data-index="${idx}"]`).value;
 
-                localStorage.setItem('sol_stations_v6', JSON.stringify(stations));
+                localStorage.setItem('sol_stations_v7', JSON.stringify(stations));
                 renderCatalog();
                 updateActiveStation();
                 alert('¡Radio actualizada con éxito!');
@@ -168,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const idx = e.currentTarget.getAttribute('data-index');
                 if (confirm(`¿Eliminar la radio "${stations[idx].name}"?`)) {
                     stations.splice(idx, 1);
-                    localStorage.setItem('sol_stations_v6', JSON.stringify(stations));
+                    localStorage.setItem('sol_stations_v7', JSON.stringify(stations));
                     renderCatalog();
                     updateActiveStation();
                     renderAdminList();
@@ -256,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
             logo: logo || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&auto=format&fit=crop&q=80'
         });
 
-        localStorage.setItem('sol_stations_v6', JSON.stringify(stations));
+        localStorage.setItem('sol_stations_v7', JSON.stringify(stations));
         activeStationIndex = stations.length - 1;
         
         inputStationName.value = '';
@@ -267,10 +263,9 @@ document.addEventListener('DOMContentLoaded', () => {
         renderCatalog();
         updateActiveStation();
         renderAdminList();
-        alert('¡Radio agregada con éxito al Kiosko!');
+        alert('¡Radio agregada con éxito!');
     });
 
-    // Controles de Reproducción con control del LIVE dinámico
     playPauseBtn.addEventListener('click', () => {
         if (!isPlaying) {
             startPlayback();
@@ -306,8 +301,6 @@ document.addEventListener('DOMContentLoaded', () => {
             stationCoverFrame.classList.add('playing');
             statusText.textContent = 'En Sintonía';
             serverStatusIndicator.style.borderColor = '#22c55e';
-            
-            // Activar indicador LIVE dinámico y respiración
             liveBadgeIndicator.classList.add('active');
         }).catch(err => {
             console.error("Error al reproducir:", err);
@@ -316,8 +309,6 @@ document.addEventListener('DOMContentLoaded', () => {
             isPlaying = false;
             playIcon.className = 'fa-solid fa-play';
             stationCoverFrame.classList.remove('playing');
-            
-            // Apagar indicador LIVE dinámico
             liveBadgeIndicator.classList.remove('active');
         });
     }
@@ -329,8 +320,6 @@ document.addEventListener('DOMContentLoaded', () => {
         playIcon.className = 'fa-solid fa-play';
         stationCoverFrame.classList.remove('playing');
         statusText.textContent = 'Detenido';
-        
-        // Apagar indicador LIVE dinámico
         liveBadgeIndicator.classList.remove('active');
     }
 
@@ -338,7 +327,6 @@ document.addEventListener('DOMContentLoaded', () => {
         audioStream.volume = e.target.value;
     });
 
-    // Inicializar
     renderCatalog();
     updateActiveStation();
 
