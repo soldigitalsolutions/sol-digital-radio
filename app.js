@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
             name: "Olímpica Estéreo Barranquilla", 
             category: "colombia", 
             genre: "General",
-            url: "https://playerservices.streamtheworld.com/api/livestream-redirect/OLP_BARRANQUILLAAAC.aac?dist=oro_web", 
+            url: "https://24483.live.streamtheworld.com/OLP_BARRANQUILLAAAC_SC", 
             logo: "https://static.mytuner.mobi/media/tvos_radios/913/olimpica-stereo-barranquilla-921-fm.a7f8c4c5.png" 
         },
         { 
