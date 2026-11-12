@@ -438,3 +438,40 @@ document.addEventListener('DOMContentLoaded', () => {
         navigator.serviceWorker.register('sw.js').catch(() => {});
     }
 });
+// --- LÓGICA DE INSTALACIÓN PWA (DESCARGAR APP) ---
+let deferredPrompt;
+const installAppBtn = document.getElementById('installAppBtn');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Previene que Chrome muestre el banner automático por defecto
+    e.preventDefault();
+    deferredPrompt = e;
+    
+    // Muestra nuestro botón de instalación personalizado
+    if (installAppBtn) {
+        installAppBtn.classList.remove('hidden');
+    }
+});
+
+if (installAppBtn) {
+    installAppBtn.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        
+        // Muestra el prompt de instalación nativo del sistema
+        deferredPrompt.prompt();
+        
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+            console.log('Usuario aceptó instalar la PWA');
+        }
+        deferredPrompt = null;
+        installAppBtn.classList.add('hidden');
+    });
+}
+
+window.addEventListener('appinstalled', () => {
+    console.log('¡Aplicación instalada con éxito!');
+    if (installAppBtn) {
+        installAppBtn.classList.add('hidden');
+    }
+});
