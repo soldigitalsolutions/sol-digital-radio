@@ -119,22 +119,8 @@
 
         </div>
 
-        <!-- ZONA INFERIOR: Botones de Ayuda, Instalar, Compartir y Gestionar Radios -->
+        <!-- ZONA INFERIOR: Botones de Instalar, Compartir y Gestionar Radios -->
         <div class="cabinet-global-actions-bar">
-            
-            <!-- Botón de Centro de Ayuda e Instalación -->
-            <button id="openHelpModalBtn" class="help-center-btn-global">
-                <div class="help-icon-side">
-                    <img src="assets/icon-192.png" alt="Sol Icono">
-                    <i class="fa-solid fa-broadcast-tower radio-icon-small"></i>
-                </div>
-                <div class="help-text-side">
-                    <h3>¿Cómo tener esta App en tu celular o PC?</h3>
-                    <p>Instrucciones paso a paso</p>
-                </div>
-                <i class="fa-solid fa-chevron-right arrow-icon"></i>
-            </button>
-
             <!-- Botón de Instalación Automática (Oculto hasta que el navegador lo permita) -->
             <button id="installAppBtn" class="install-app-btn-global hidden">
                 <i class="fa-solid fa-download"></i> Instalar Aplicación
@@ -166,6 +152,13 @@
 
     </div>
 
+    <!-- BOTÓN FLOTANTE DE AYUDA (Esquina Inferior Derecha) -->
+    <button id="openHelpModalBtn" class="floating-help-pill" title="Centro de Ayuda e Instalación">
+        <i class="fa-solid fa-sun sun-ic"></i>
+        <span>¿Ayuda?</span>
+        <i class="fa-solid fa-radio radio-ic"></i>
+    </button>
+
     <!-- MODAL DE CONTRASEÑA -->
     <div id="adminPasswordModal" class="admin-modal hidden">
         <div class="admin-card auth-box">
@@ -181,28 +174,31 @@
         </div>
     </div>
 
-    <!-- PANEL DE AYUDA E INSTALACIÓN (MODAL ESTILO TARJETA) -->
+    <!-- PANEL DE AYUDA E INSTALACIÓN (MODAL CLARO Y LEGIBLE) -->
     <div id="helpDashboardModal" class="admin-modal hidden">
         <div class="admin-dashboard-container help-dash-style">
             <div class="dashboard-top-bar help-dash-top">
-                <h3><i class="fa-solid fa-broadcast-tower"></i> Centro de Ayuda Sol Digital</h3>
+                <h3><i class="fa-solid fa-sun"></i> Centro de Ayuda Sol Digital</h3>
                 <button id="closeHelpDashBtn" class="close-dash-btn"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
             <div class="dashboard-grid-split help-grid-split">
                 <!-- Columna de Bienvenida -->
                 <div class="welcome-message-card">
-                    <div class="star-icon-head">☆</div>
+                    <div class="welcome-icons-head">
+                        <i class="fa-solid fa-sun"></i>
+                        <i class="fa-solid fa-radio"></i>
+                    </div>
                     <h4>¡Bienvenid@ a Sol Digital Radio!</h4>
-                    <p>Toca en el botón de abajo para compartir o descubre cómo instalar nuestra app paso a paso en tus dispositivos.</p>
+                    <p>Comparte nuestra rocola con tus amigos o descubre cómo instalar la App paso a paso en tu dispositivo.</p>
                     <button id="shareAppBtnInternal" class="share-app-btn-internal">
                         <i class="fa-solid fa-share-nodes"></i> Compartir esta App con amigos
                     </button>
                 </div>
 
                 <!-- Columna de Instrucciones Interactivas -->
-                <div class="configure-stations-card help-instructions-box">
-                    <h4><i class="fa-solid fa-mobile-alt"></i> ¿Cómo tener la App en tu celular o PC?</h4>
+                <div class="help-instructions-box">
+                    <h4><i class="fa-solid fa-mobile-screen-button"></i> ¿Cómo tener la App en tu celular o PC?</h4>
                     
                     <!-- Pestañas de Dispositivos -->
                     <div class="device-selector-tabs">
@@ -222,15 +218,15 @@
                         <!-- iPhone -->
                         <div class="device-instr-pane active" id="instr-iphone">
                             <ol class="steps-list">
-                                <li>Toca el icono de <b>Compartir</b> <i class="fa-solid fa-share-square"></i> en la barra inferior de Safari.</li>
-                                <li>Desliza las opciones y selecciona <b>"Agregar a inicio"</b> <i class="fa-solid fa-plus-square"></i>.</li>
+                                <li>Toca el icono de <b>Compartir</b> <i class="fa-solid fa-arrow-up-from-bracket"></i> en la barra inferior de Safari.</li>
+                                <li>Desliza las opciones y selecciona <b>"Agregar a inicio"</b> <i class="fa-regular fa-square-plus"></i>.</li>
                                 <li>Toca <b>"Agregar"</b> arriba a la derecha. ¡Listo!</li>
                             </ol>
                         </div>
                         <!-- Android -->
                         <div class="device-instr-pane" id="instr-android">
                             <ol class="steps-list">
-                                <li>En Google Chrome, abre el menú de opciones (tres puntos) <i class="fa-solid fa-ellipsis-v"></i>.</li>
+                                <li>En Google Chrome, abre el menú de opciones (tres puntos) <i class="fa-solid fa-ellipsis-vertical"></i>.</li>
                                 <li>Selecciona <b>"Instalar aplicación"</b> o <b>"Añadir a pantalla de inicio"</b>.</li>
                                 <li>Confirma la instalación. ¡Listo!</li>
                             </ol>
