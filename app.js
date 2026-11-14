@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const liveBadgeIndicator = document.getElementById('liveBadgeIndicator');
     
     const shareAppBtn = document.getElementById('shareAppBtn');
+    const shareAppBtnInternal = document.getElementById('shareAppBtnInternal');
     const openAdminModalBtn = document.getElementById('openAdminModalBtn');
     const adminPasswordModal = document.getElementById('adminPasswordModal');
     const adminPasswordInput = document.getElementById('adminPasswordInput');
@@ -34,6 +35,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputStationLogo = document.getElementById('inputStationLogo');
     const adminStationsList = document.getElementById('adminStationsList');
     const dirTabs = document.querySelectorAll('.dir-tab');
+
+    // Elementos del Centro de Ayuda e Instalación
+    const openHelpModalBtn = document.getElementById('openHelpModalBtn');
+    const helpDashboardModal = document.getElementById('helpDashboardModal');
+    const closeHelpDashBtn = document.getElementById('closeHelpDashBtn');
+    const deviceTabs = document.querySelectorAll('.device-tab');
+    const instrPanes = document.querySelectorAll('.device-instr-pane');
+    const installAppBtn = document.getElementById('installAppBtn');
 
     // Catálogo de Emisoras
     let stations = JSON.parse(localStorage.getItem('sol_stations_v9')) || [
@@ -64,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentFilter = 'all';
     let isPlaying = false;
 
-    // --- CONFIGURACIÓN DEL VISUALIZADOR DE AUDIO (HÍBRIDO INTELIGENTE EN VIVO) ---
+    // --- VISUALIZADOR DE AUDIO (HÍBRIDO INTELIGENTE EN VIVO) ---
     let audioCtx = null;
     let analyser = null;
     let sourceNode = null;
@@ -115,7 +124,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // Sistema inteligente: si el stream protege CORS, genera ondas espectrales fluidas y orgánicas sincronizadas
             if (!hasRealData) {
                 for (let i = 0; i < freqData.length; i++) {
                     let wave = Math.sin(Date.now() / 120 + (i * 0.4)) * 110 + 70;
@@ -131,9 +139,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const barHeight = (freqData[i] / 255) * height * 0.95;
                 
                 let gradient = canvasCtx.createLinearGradient(0, height, 0, 0);
-                gradient.addColorStop(0, '#FCD116'); // Amarillo Colombia
-                gradient.addColorStop(0.5, '#38bdf8'); // Azul Cielo
-                gradient.addColorStop(1, '#a855f7'); // Violeta Neón
+                gradient.addColorStop(0, '#FCD116');
+                gradient.addColorStop(0.5, '#38bdf8');
+                gradient.addColorStop(1, '#a855f7');
 
                 canvasCtx.fillStyle = gradient;
                 canvasCtx.shadowBlur = 12;
@@ -143,7 +151,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 x += barWidth + 2;
             }
         } else {
-            // Línea de descanso elegante cuando está pausado
             canvasCtx.fillStyle = '#2a3b5c';
             canvasCtx.shadowBlur = 0;
             canvasCtx.fillRect(0, height / 2 - 1, width, 2);
@@ -155,9 +162,84 @@ document.addEventListener('DOMContentLoaded', () => {
         drawVisualizer();
     }
 
+    // --- LÓGICA DE INSTALACIÓN PWA ---
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        if (installAppBtn) installAppBtn.classList.remove('hidden');
+    });
+
+    if (installAppBtn) {
+        installAppBtn.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                installAppBtn.classList.add('hidden');
+            }
+            deferredPrompt = null;
+        });
+    }
+
+    window.addEventListener('appinstalled', () => {
+        if (installAppBtn) installAppBtn.classList.add('hidden');
+    });
+
+    // --- LÓGICA DEL CENTRO DE AYUDA ---
+    if (openHelpModalBtn) {
+        openHelpModalBtn.addEventListener('click', () => {
+            if (helpDashboardModal) {
+                helpDashboardModal.classList.remove('hidden');
+                switchDeviceTab('iphone');
+            }
+        });
+    }
+
+    if (closeHelpDashBtn) {
+        closeHelpDashBtn.addEventListener('click', () => {
+            if (helpDashboardModal) helpDashboardModal.classList.add('hidden');
+        });
+    }
+
+    function switchDeviceTab(device) {
+        deviceTabs.forEach(t => t.classList.remove('active'));
+        instrPanes.forEach(p => p.classList.remove('active'));
+        
+        const selectedTab = document.querySelector(`.device-tab[data-device="${device}"]`);
+        const selectedPane = document.getElementById(`instr-${device}`);
+        
+        if (selectedTab) selectedTab.classList.add('active');
+        if (selectedPane) selectedPane.classList.add('active');
+    }
+
+    deviceTabs.forEach(tab => {
+        tab.addEventListener('click', (e) => {
+            const device = e.currentTarget.getAttribute('data-device');
+            switchDeviceTab(device);
+        });
+    });
+
+    // --- COMPARTIR APP ---
+    function triggerShare() {
+        if (navigator.share) {
+            navigator.share({
+                title: 'Sol Digital Radio',
+                text: '¡Escucha las mejores emisoras en Sol Digital Radio!',
+                url: window.location.href
+            }).catch(() => {});
+        } else {
+            navigator.clipboard.writeText(window.location.href);
+            alert('¡Enlace copiado al portapapeles!');
+        }
+    }
+
+    if (shareAppBtn) shareAppBtn.addEventListener('click', triggerShare);
+    if (shareAppBtnInternal) shareAppBtnInternal.addEventListener('click', triggerShare);
+
+    // --- GESTIÓN DE EMISORAS Y CATALOGO ---
     function renderCatalog() {
         stationsCatalogGrid.innerHTML = '';
-        
         stations.forEach((station, index) => {
             if (currentFilter !== 'all' && station.category !== currentFilter) return;
 
@@ -195,7 +277,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderAdminList() {
         adminStationsList.innerHTML = '';
-        
         stations.forEach((station, index) => {
             const row = document.createElement('div');
             row.className = 'admin-station-row';
@@ -272,19 +353,6 @@ document.addEventListener('DOMContentLoaded', () => {
             currentFilter = tab.getAttribute('data-category');
             renderCatalog();
         });
-    });
-
-    shareAppBtn.addEventListener('click', () => {
-        if (navigator.share) {
-            navigator.share({
-                title: 'Sol Digital Radio',
-                text: '¡Escucha las mejores emisoras en Sol Digital Radio!',
-                url: window.location.href
-            }).catch(() => {});
-        } else {
-            navigator.clipboard.writeText(window.location.href);
-            alert('¡Enlace copiado al portapapeles!');
-        }
     });
 
     openAdminModalBtn.addEventListener('click', () => {
@@ -436,42 +504,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js').catch(() => {});
-    }
-});
-// --- LÓGICA DE INSTALACIÓN PWA (DESCARGAR APP) ---
-let deferredPrompt;
-const installAppBtn = document.getElementById('installAppBtn');
-
-window.addEventListener('beforeinstallprompt', (e) => {
-    // Previene que Chrome muestre el banner automático por defecto
-    e.preventDefault();
-    deferredPrompt = e;
-    
-    // Muestra nuestro botón de instalación personalizado
-    if (installAppBtn) {
-        installAppBtn.classList.remove('hidden');
-    }
-});
-
-if (installAppBtn) {
-    installAppBtn.addEventListener('click', async () => {
-        if (!deferredPrompt) return;
-        
-        // Muestra el prompt de instalación nativo del sistema
-        deferredPrompt.prompt();
-        
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
-            console.log('Usuario aceptó instalar la PWA');
-        }
-        deferredPrompt = null;
-        installAppBtn.classList.add('hidden');
-    });
-}
-
-window.addEventListener('appinstalled', () => {
-    console.log('¡Aplicación instalada con éxito!');
-    if (installAppBtn) {
-        installAppBtn.classList.add('hidden');
     }
 });
