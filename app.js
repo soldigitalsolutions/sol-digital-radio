@@ -54,11 +54,11 @@ document.addEventListener('DOMContentLoaded', () => {
             logo: "https://static.mytuner.mobi/media/tvos_radios/913/olimpica-stereo-barranquilla-921-fm.a7f8c4c5.png" 
         },
         { 
-            name: "Reggaeton 92.3 FM", 
-            category: "republica dominicana", 
-            genre: "Reggaeton",
-            url: "https://streampanel.online/8495/stream", 
-            logo: "https://streampanel.online/img/stream_logos/385.jpg?t=1794636709269" 
+            name: "rm.fm", 
+            category: "alemania", 
+            genre: "top100-djcharts",
+            url: "https://breakz-high.rautemusik.fm/?ref=radiobrowser-top100-djcharts", 
+            logo: "https://i.postimg.cc/fRh4n4hg/Captura-de-pantalla-2026-11-09-232403.png" 
         },
         { 
             name: "Mix 103.9 Barranquilla", 
@@ -67,22 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
             url: "https://playerservices.streamtheworld.com/api/livestream-redirect/MIX_BARRANQUILLAAAC.aac?dist=oro_web", 
             logo: "https://static.mytuner.mobi/media/tvos_radios/577/mix-1039-fm.664b9586.jpg" 
         }
-        { 
-            name: "La Kalle 96.9", 
-            category: "colombia", 
-            genre: "General",
-            url: "http://playerservices.streamtheworld.com/m3u/LA_KALLE.m3u", 
-            logo: "https://thumbnail.anii.io/co/120f8533-a122-11ef-8b9a-60ad4349a14f.webp" 
-        }
-        { 
-            name: "Himnos Cristianos Del Ayer", 
-            category: "colombia", 
-            genre: "cristiana",
-            url: "https://stream.zeno.fm/vkancadp2v8uv", 
-            logo: "https://images.zeno.fm/wuiJiKL-mLyUj54hJGGrjRWahSyjQJzwBC2E5xzmERU/rs:fill:304:304/q:75/g:ce:0:0/aHR0cHM6Ly9wcm94eS56ZW5vLmZtL2NvbnRlbnQvc3RhdGlvbnMvYWd4emZucGxibTh0YzNSaGRITnlNZ3NTQ2tGMWRHaERiR2xsYm5RWWdJQ1FsTEQ5eWdvTUN4SU9VM1JoZEdsdmJsQnliMlpwYkdVWWdJQ3dwcWZwbkFrTW9nRUVlbVZ1YncvaW1hZ2UvP3U9MTY2MTU5MTQ3NjAwMA" 
-        },
     ];
-
 
     let activeStationIndex = 0;
     let currentFilter = 'all';
