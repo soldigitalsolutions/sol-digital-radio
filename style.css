@@ -370,7 +370,7 @@ body {
 .station-card-title { font-size: 0.75rem; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
 .station-card-genre { font-size: 0.65rem; color: var(--colombia-yellow); }
 
-/* --- BARRA GLOBAL INFERIOR PARA COMPARTIR Y GESTIONAR --- */
+/* --- BARRA GLOBAL INFERIOR --- */
 .cabinet-global-actions-bar {
     padding: 14px 25px;
     background: linear-gradient(180deg, #131c2e 0%, #0b0f19 100%);
@@ -380,6 +380,59 @@ body {
     align-items: center;
     gap: 8px;
 }
+
+/* Botón de Centro de Ayuda */
+.help-center-btn-global {
+    width: 100%;
+    max-width: 380px;
+    background: linear-gradient(135deg, #FCD116, #f59e0b);
+    color: #0b0f19;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(252, 209, 22, 0.25);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    transition: transform 0.2s;
+    text-align: left;
+}
+.help-center-btn-global:hover { transform: scale(1.02); }
+.help-icon-side { display: flex; align-items: center; gap: 6px; }
+.help-icon-side img {
+    width: 36px; height: 36px; border-radius: 10px; object-fit: cover;
+    background-color: #070a12; padding: 2px; border: 1px solid rgba(0,0,0,0.2);
+}
+.help-icon-side .radio-icon-small { font-size: 0.9rem; color: #0b0f19; }
+.help-text-side h3 { font-size: 0.8rem; font-weight: 700; margin: 0; }
+.help-text-side p { font-size: 0.65rem; margin: 0; opacity: 0.85; }
+.help-center-btn-global .arrow-icon { font-size: 0.85rem; opacity: 0.7; }
+
+/* Botón de Instalación Automática */
+.install-app-btn-global {
+    width: 100%;
+    max-width: 380px;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.2s;
+}
+.install-app-btn-global:hover { transform: scale(1.02); }
+.install-app-btn-global.hidden { display: none; }
+
+/* Botón de Compartir App */
 .share-app-btn-global {
     width: 100%;
     max-width: 380px;
@@ -398,9 +451,8 @@ body {
     gap: 8px;
     transition: transform 0.2s;
 }
-.share-app-btn-global:hover {
-    transform: scale(1.02);
-}
+.share-app-btn-global:hover { transform: scale(1.02); }
+
 .hidden-admin-trigger-global {
     background: none;
     border: none;
@@ -414,12 +466,72 @@ body {
     transition: opacity 0.2s, color 0.2s;
     padding: 4px;
 }
-.hidden-admin-trigger-global:hover {
-    opacity: 1;
-    color: var(--colombia-yellow);
+.hidden-admin-trigger-global:hover { opacity: 1; color: var(--colombia-yellow); }
+
+/* --- ESTILOS DEL MODAL DE AYUDA (Estilo Tarjeta Referencia) --- */
+.help-dash-style {
+    background: #fff;
+    color: #070a12;
+    border-radius: 24px;
+    max-width: 850px;
+}
+.help-dash-top {
+    background: linear-gradient(90deg, #FCD116 0%, #f97316 100%);
+    color: #fff;
+    border-bottom: none;
+    border-top-left-radius: 22px;
+    border-top-right-radius: 22px;
+    padding: 15px 25px;
+}
+.help-dash-top h3 { color: #fff; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
+.help-grid-split { background: #fff; padding: 20px; gap: 15px; }
+
+.welcome-message-card {
+    background: #fff5e6;
+    border: 1px solid #ffe0b3;
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+}
+.star-icon-head { font-size: 2rem; color: #f97316; margin-bottom: 8px; }
+.welcome-message-card h4 { font-size: 1.1rem; color: #c2410c; font-weight: 700; margin-bottom: 8px; }
+.welcome-message-card p { font-size: 0.8rem; color: #57534e; margin-bottom: 15px; line-height: 1.4; }
+.share-app-btn-internal {
+    width: 100%;
+    background: #f97316;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
 }
 
-/* Modales */
+.help-instructions-box { background: #fff; border: 1px solid #e5e7eb; padding: 15px; }
+.help-instructions-box h4 { font-size: 0.9rem; color: #111827; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+
+.device-selector-tabs { display: flex; gap: 6px; margin-bottom: 15px; }
+.device-tab {
+    flex: 1; background: #f3f4f6; border: 1px solid #e5e7eb; padding: 8px;
+    border-radius: 8px; font-size: 0.8rem; cursor: pointer; display: flex;
+    align-items: center; justify-content: center; gap: 6px; color: #4b5563; font-weight: 500;
+}
+.device-tab.active { background: #fff5e6; border-color: #f97316; color: #c2410c; font-weight: 600; }
+
+.device-instr-pane { display: none; }
+.device-instr-pane.active { display: block; }
+.steps-list { margin-left: 20px; font-size: 0.83rem; color: #374151; line-height: 1.6; }
+.steps-list li { margin-bottom: 8px; }
+.steps-list li b { color: #c2410c; }
+.app-footer-note { font-size: 0.72rem; color: #9ca3af; text-align: center; margin-top: 15px; font-style: italic; }
+
+/* Modales generales */
 .admin-modal {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(7, 10, 18, 0.9);
     display: flex; justify-content: center; align-items: center; padding: 15px; z-index: 2000;
@@ -441,42 +553,19 @@ body {
 .close-dash-btn { background: none; border: none; color: var(--text-secondary); font-size: 1.2rem; cursor: pointer; }
 
 .github-export-banner {
-    background: var(--screen-bg);
-    border: 1px dashed rgba(252, 209, 22, 0.4);
-    border-radius: 12px;
-    margin: 15px 20px 0 20px;
-    padding: 12px 18px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    background: var(--screen-bg); border: 1px dashed rgba(252, 209, 22, 0.4); border-radius: 12px;
+    margin: 15px 20px 0 20px; padding: 12px 18px; display: flex; justify-content: space-between; align-items: center;
 }
-.github-export-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    color: var(--colombia-yellow);
-    font-size: 1.1rem;
-}
+.github-export-info { display: flex; align-items: center; gap: 12px; color: var(--colombia-yellow); font-size: 1.1rem; }
 .github-export-info strong { font-size: 0.85rem; color: var(--text-primary); display: block; }
 .github-export-info p { font-size: 0.7rem; color: var(--text-secondary); margin: 0; }
 .btn-download-gh {
-    background: linear-gradient(135deg, #f59e0b, #d97706);
-    color: #fff;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 0.75rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; border: none;
+    padding: 8px 16px; border-radius: 10px; font-weight: 600; font-size: 0.75rem; cursor: pointer;
+    display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
 }
 
-.dashboard-grid-split {
-    display: grid; grid-template-columns: 320px 1fr; gap: 20px; padding: 20px; flex: 1; overflow: hidden;
-}
+.dashboard-grid-split { display: grid; grid-template-columns: 320px 1fr; gap: 20px; padding: 20px; flex: 1; overflow: hidden; }
 @media (max-width: 768px) { .dashboard-grid-split { grid-template-columns: 1fr; overflow-y: auto; } }
 
 .add-station-form-card, .configure-stations-card {
@@ -520,29 +609,3 @@ body {
 .brand-signature .by-text { color: var(--text-secondary); font-weight: 400; }
 .brand-signature .epamar-text { font-style: italic; color: #f8fafc; font-weight: 700; }
 .copyright { font-size: 0.65rem; color: var(--text-secondary); margin-top: 2px; }
-
-.install-app-btn-global {
-    width: 100%;
-    max-width: 380px;
-    background: linear-gradient(135deg, #22c55e, #16a34a);
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 20px;
-    font-weight: 600;
-    font-size: 0.8rem;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    transition: transform 0.2s;
-    margin-bottom: 4px;
-}
-.install-app-btn-global:hover {
-    transform: scale(1.02);
-}
-.install-app-btn-global.hidden {
-    display: none;
-}
