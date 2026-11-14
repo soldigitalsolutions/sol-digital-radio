@@ -68,6 +68,13 @@ document.addEventListener('DOMContentLoaded', () => {
             logo: "https://static.mytuner.mobi/media/tvos_radios/577/mix-1039-fm.664b9586.jpg" 
         }
         { 
+            name: "La Kalle 96.9", 
+            category: "colombia", 
+            genre: "General",
+            url: "http://playerservices.streamtheworld.com/m3u/LA_KALLE.m3u", 
+            logo: "https://thumbnail.anii.io/co/120f8533-a122-11ef-8b9a-60ad4349a14f.webp" 
+        }
+        { 
             name: "Himnos Cristianos Del Ayer", 
             category: "colombia", 
             genre: "cristiana",
