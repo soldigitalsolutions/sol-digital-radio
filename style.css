@@ -43,7 +43,7 @@ body {
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), inset 0 0 25px rgba(252, 209, 22, 0.05);
     display: flex;
     flex-direction: column;
-    overflow: visible;
+    overflow: hidden;
     position: relative;
 }
 
@@ -261,7 +261,7 @@ body {
 .station-cover-frame {
     width: 100%;
     height: 160px;
-    background: #000;
+    background: #0b0f19;
     border-radius: 12px;
     overflow: hidden;
     position: relative;
@@ -365,8 +365,27 @@ body {
 }
 .station-card-item:hover { border-color: var(--colombia-yellow); transform: translateY(-2px); }
 .station-card-item.active { border-color: var(--colombia-yellow); background: linear-gradient(145deg, #1e293b, #131c2e); box-shadow: 0 0 10px var(--accent-glow); }
-.station-card-thumb { width: 55px; height: 55px; border-radius: 50%; overflow: hidden; margin-bottom: 6px; border: 2px solid var(--border-color); }
-.station-card-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Ajuste automático de logotipos en tarjetas para que nunca se corten */
+.station-card-thumb {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 8px;
+    border: 2px solid var(--border-color);
+    background-color: #0b0f19;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 4px;
+}
+.station-card-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
+}
 .station-card-title { font-size: 0.75rem; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
 .station-card-genre { font-size: 0.65rem; color: var(--colombia-yellow); }
 
@@ -380,35 +399,6 @@ body {
     align-items: center;
     gap: 8px;
 }
-
-/* Botón de Centro de Ayuda */
-.help-center-btn-global {
-    width: 100%;
-    max-width: 380px;
-    background: linear-gradient(135deg, #FCD116, #f59e0b);
-    color: #0b0f19;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 20px;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(252, 209, 22, 0.25);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    transition: transform 0.2s;
-    text-align: left;
-}
-.help-center-btn-global:hover { transform: scale(1.02); }
-.help-icon-side { display: flex; align-items: center; gap: 6px; }
-.help-icon-side img {
-    width: 36px; height: 36px; border-radius: 10px; object-fit: cover;
-    background-color: #070a12; padding: 2px; border: 1px solid rgba(0,0,0,0.2);
-}
-.help-icon-side .radio-icon-small { font-size: 0.9rem; color: #0b0f19; }
-.help-text-side h3 { font-size: 0.8rem; font-weight: 700; margin: 0; }
-.help-text-side p { font-size: 0.65rem; margin: 0; opacity: 0.85; }
-.help-center-btn-global .arrow-icon { font-size: 0.85rem; opacity: 0.7; }
 
 /* Botón de Instalación Automática */
 .install-app-btn-global {
@@ -468,73 +458,48 @@ body {
 }
 .hidden-admin-trigger-global:hover { opacity: 1; color: var(--colombia-yellow); }
 
-/* --- ESTILOS DEL MODAL DE AYUDA (Estilo Tarjeta Referencia) --- */
-.help-dash-style {
-    background: #fff;
-    color: #070a12;
-    border-radius: 24px;
-    max-width: 850px;
-}
-.help-dash-top {
-    background: linear-gradient(90deg, #FCD116 0%, #f97316 100%);
-    color: #fff;
-    border-bottom: none;
-    border-top-left-radius: 22px;
-    border-top-right-radius: 22px;
-    padding: 15px 25px;
-}
-.help-dash-top h3 { color: #fff; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
-.help-grid-split { background: #fff; padding: 20px; gap: 15px; }
-
-.welcome-message-card {
-    background: #fff5e6;
-    border: 1px solid #ffe0b3;
-    border-radius: 16px;
-    padding: 20px;
-    text-align: center;
-}
-.star-icon-head { font-size: 2rem; color: #f97316; margin-bottom: 8px; }
-.welcome-message-card h4 { font-size: 1.1rem; color: #c2410c; font-weight: 700; margin-bottom: 8px; }
-.welcome-message-card p { font-size: 0.8rem; color: #57534e; margin-bottom: 15px; line-height: 1.4; }
-.share-app-btn-internal {
-    width: 100%;
-    background: #f97316;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 12px;
-    font-weight: 600;
-    font-size: 0.8rem;
+/* --- BOTÓN FLOTANTE DE AYUDA (ESQUINA INFERIOR DERECHA) --- */
+.floating-help-pill {
+    position: fixed;
+    bottom: 22px;
+    right: 22px;
+    background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+    color: #ffffff;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    padding: 10px 18px;
+    border-radius: 50px;
+    font-size: 0.88rem;
+    font-weight: 700;
     cursor: pointer;
     display: flex;
-    justify-content: center;
     align-items: center;
     gap: 8px;
-    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+    box-shadow: 0 8px 25px rgba(234, 88, 12, 0.45);
+    z-index: 1500;
+    transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s ease;
 }
-
-.help-instructions-box { background: #fff; border: 1px solid #e5e7eb; padding: 15px; }
-.help-instructions-box h4 { font-size: 0.9rem; color: #111827; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
-
-.device-selector-tabs { display: flex; gap: 6px; margin-bottom: 15px; }
-.device-tab {
-    flex: 1; background: #f3f4f6; border: 1px solid #e5e7eb; padding: 8px;
-    border-radius: 8px; font-size: 0.8rem; cursor: pointer; display: flex;
-    align-items: center; justify-content: center; gap: 6px; color: #4b5563; font-weight: 500;
+.floating-help-pill:hover {
+    transform: scale(1.1);
+    box-shadow: 0 12px 30px rgba(234, 88, 12, 0.65);
 }
-.device-tab.active { background: #fff5e6; border-color: #f97316; color: #c2410c; font-weight: 600; }
-
-.device-instr-pane { display: none; }
-.device-instr-pane.active { display: block; }
-.steps-list { margin-left: 20px; font-size: 0.83rem; color: #374151; line-height: 1.6; }
-.steps-list li { margin-bottom: 8px; }
-.steps-list li b { color: #c2410c; }
-.app-footer-note { font-size: 0.72rem; color: #9ca3af; text-align: center; margin-top: 15px; font-style: italic; }
+.floating-help-pill:active {
+    transform: scale(0.96);
+}
+.floating-help-pill .sun-ic {
+    color: #FCD116;
+    font-size: 1.05rem;
+    filter: drop-shadow(0 0 4px rgba(252, 209, 22, 0.6));
+}
+.floating-help-pill .radio-ic {
+    color: #fff7ed;
+    font-size: 0.95rem;
+}
 
 /* Modales generales */
 .admin-modal {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(7, 10, 18, 0.9);
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(7, 10, 18, 0.88);
     display: flex; justify-content: center; align-items: center; padding: 15px; z-index: 2000;
+    backdrop-filter: blur(4px);
 }
 .admin-modal.hidden { display: none; }
 .admin-card { background: var(--cabinet-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; width: 100%; max-width: 350px; }
@@ -550,7 +515,7 @@ body {
     display: flex; justify-content: space-between; align-items: center;
 }
 .dashboard-top-bar h3 { font-size: 1rem; color: var(--colombia-yellow); display: flex; align-items: center; gap: 8px; }
-.close-dash-btn { background: none; border: none; color: var(--text-secondary); font-size: 1.2rem; cursor: pointer; }
+.close-dash-btn { background: none; border: none; color: var(--text-secondary); font-size: 1.25rem; cursor: pointer; }
 
 .github-export-banner {
     background: var(--screen-bg); border: 1px dashed rgba(252, 209, 22, 0.4); border-radius: 12px;
@@ -597,6 +562,163 @@ body {
 .admin-station-row-top { display: flex; justify-content: space-between; align-items: center; }
 .admin-station-name { font-size: 0.8rem; font-weight: 600; color: var(--text-primary); }
 .admin-station-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+
+/* --- ESTILOS DEL MODAL DE AYUDA (CLARO, LIMPIO Y LEGIBLE) --- */
+.admin-dashboard-container.help-dash-style {
+    background: #fffaf5;
+    color: #1f2937;
+    border: 2px solid #fed7aa;
+    border-radius: 24px;
+    max-width: 850px;
+    height: auto;
+    max-height: 90vh;
+}
+.dashboard-top-bar.help-dash-top {
+    background: linear-gradient(90deg, #f59e0b 0%, #ea580c 100%);
+    color: #ffffff;
+    border-bottom: none;
+    padding: 16px 24px;
+}
+.dashboard-top-bar.help-dash-top h3 {
+    color: #ffffff;
+    font-size: 1.05rem;
+}
+.dashboard-top-bar.help-dash-top .close-dash-btn {
+    color: #ffffff;
+    opacity: 0.9;
+}
+.dashboard-top-bar.help-dash-top .close-dash-btn:hover {
+    opacity: 1;
+}
+
+.dashboard-grid-split.help-grid-split {
+    background: #fffaf5;
+    padding: 22px;
+    gap: 18px;
+    overflow-y: auto;
+}
+
+.welcome-message-card {
+    background: #ffffff;
+    border: 1px solid #fed7aa;
+    border-radius: 18px;
+    padding: 22px 18px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(234, 88, 12, 0.06);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.welcome-icons-head {
+    font-size: 1.8rem;
+    color: #f59e0b;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+.welcome-icons-head .fa-radio {
+    color: #ea580c;
+    font-size: 1.6rem;
+}
+.welcome-message-card h4 {
+    font-size: 1.05rem;
+    color: #c2410c;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+.welcome-message-card p {
+    font-size: 0.8rem;
+    color: #4b5563;
+    margin-bottom: 18px;
+    line-height: 1.5;
+}
+.share-app-btn-internal {
+    width: 100%;
+    background: linear-gradient(135deg, #f59e0b, #ea580c);
+    color: #ffffff;
+    border: none;
+    padding: 11px 18px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.82rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25);
+    transition: transform 0.2s;
+}
+.share-app-btn-internal:hover {
+    transform: scale(1.02);
+}
+
+.help-instructions-box {
+    background: #ffffff;
+    border: 1px solid #fed7aa;
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(234, 88, 12, 0.06);
+}
+.help-instructions-box h4 {
+    font-size: 0.92rem;
+    color: #111827;
+    font-weight: 700;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.help-instructions-box h4 i {
+    color: #ea580c;
+}
+
+.device-selector-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+.device-tab {
+    flex: 1;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    padding: 9px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    color: #4b5563;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+.device-tab.active {
+    background: #fff7ed;
+    border-color: #f97316;
+    color: #c2410c;
+    box-shadow: 0 2px 6px rgba(249, 115, 22, 0.15);
+}
+
+.device-instr-pane { display: none; }
+.device-instr-pane.active { display: block; }
+.steps-list {
+    margin-left: 20px;
+    font-size: 0.84rem;
+    color: #374151;
+    line-height: 1.65;
+}
+.steps-list li { margin-bottom: 10px; }
+.steps-list li b { color: #c2410c; }
+.steps-list li i { color: #ea580c; margin: 0 2px; }
+
+.app-footer-note {
+    font-size: 0.74rem;
+    color: #6b7280;
+    text-align: center;
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px dashed #e5e7eb;
+}
 
 .colombia-flag-bar { width: 100%; height: 14px; display: flex; }
 .stripe { height: 100%; flex: 1; }
