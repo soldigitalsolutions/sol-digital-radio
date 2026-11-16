@@ -44,10 +44,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const instrPanes = document.querySelectorAll('.device-instr-pane');
     const installAppBtn = document.getElementById('installAppBtn');
 
-    // VERSIÓN DEL CATÁLOGO: Sube este número (v14, v15...) cada vez que edites las emisoras aquí en el código
-    const CATALOG_VERSION = 'sol_stations_v14';
+    // VERSIÓN DEL CATÁLOGO: Sube este número (v15, v16...) cada vez que edites las emisoras aquí
+    const CATALOG_VERSION = 'sol_stations_v15';
 
-    // Limpia versiones anteriores del almacenamiento local para evitar conflictos
+    // Limpia versiones anteriores del almacenamiento local
     Object.keys(localStorage).forEach(key => {
         if (key.startsWith('sol_stations_') && key !== CATALOG_VERSION) {
             localStorage.removeItem(key);
@@ -150,7 +150,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         directoryTabsContainer.innerHTML = '';
 
-        // Pestaña "Todas"
         const allBtn = document.createElement('button');
         allBtn.className = `dir-tab ${currentFilter === 'all' ? 'active' : ''}`;
         allBtn.textContent = 'Todas';
@@ -161,7 +160,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         directoryTabsContainer.appendChild(allBtn);
 
-        // Pestañas dinámicas según los países existentes en el catálogo
         uniqueCategories.forEach(cat => {
             const btn = document.createElement('button');
             btn.className = `dir-tab ${currentFilter === cat ? 'active' : ''}`;
@@ -175,30 +173,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- VISUALIZADOR DE AUDIO (HÍBRIDO INTELIGENTE EN VIVO) ---
-    let audioCtx = null;
-    let analyser = null;
-    let sourceNode = null;
+    // --- VISUALIZADOR DE AUDIO (SIN INTERCEPTAR EL STREAM NATIVO) ---
     const canvas = document.getElementById('audioCanvas');
     const canvasCtx = canvas ? canvas.getContext('2d') : null;
-
-    function initAudioVisualizer() {
-        if (!canvas) return;
-        try {
-            if (!audioCtx) {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                audioCtx = new AudioContext();
-                analyser = audioCtx.createAnalyser();
-                analyser.fftSize = 64;
-                
-                sourceNode = audioCtx.createMediaElementSource(audioStream);
-                sourceNode.connect(analyser);
-                analyser.connect(audioCtx.destination);
-            }
-        } catch (e) {
-            console.log("Visualizador en modo dinámico alternativo.");
-        }
-    }
 
     function drawVisualizer() {
         if (!canvas || !canvasCtx) return;
@@ -209,36 +186,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const height = canvas.height;
         canvasCtx.clearRect(0, 0, width, height);
 
-        let freqData = new Uint8Array(analyser ? analyser.frequencyBinCount : 32);
+        const barCount = 32;
 
         if (isPlaying) {
-            if (audioCtx && audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-
-            let hasRealData = false;
-            if (analyser) {
-                try {
-                    analyser.getByteFrequencyData(freqData);
-                    hasRealData = freqData.some(val => val > 0);
-                } catch (err) {
-                    hasRealData = false;
-                }
-            }
-
-            if (!hasRealData) {
-                for (let i = 0; i < freqData.length; i++) {
-                    let wave = Math.sin(Date.now() / 120 + (i * 0.4)) * 110 + 70;
-                    let noise = Math.random() * 50;
-                    freqData[i] = Math.min(255, Math.abs(wave + noise));
-                }
-            }
-
-            const barWidth = (width / freqData.length) * 1.8;
+            const barWidth = (width / barCount) * 1.8;
             let x = 0;
 
-            for (let i = 0; i < freqData.length; i++) {
-                const barHeight = (freqData[i] / 255) * height * 0.95;
+            for (let i = 0; i < barCount; i++) {
+                let wave = Math.sin(Date.now() / 120 + (i * 0.45)) * 105 + 75;
+                let noise = Math.random() * 45;
+                let val = Math.min(255, Math.abs(wave + noise));
+                const barHeight = (val / 255) * height * 0.92;
                 
                 let gradient = canvasCtx.createLinearGradient(0, height, 0, 0);
                 gradient.addColorStop(0, '#FCD116');
@@ -565,7 +523,6 @@ document.addEventListener('DOMContentLoaded', () => {
         startPlayback();
     });
 
-    // Se activa únicamente cuando el audio empieza a sonar de verdad
     audioStream.addEventListener('playing', () => {
         isConnecting = false;
         isPlaying = true;
@@ -574,14 +531,8 @@ document.addEventListener('DOMContentLoaded', () => {
         statusText.textContent = 'En Sintonía';
         serverStatusIndicator.style.borderColor = '#22c55e';
         liveBadgeIndicator.classList.add('active');
-        
-        initAudioVisualizer();
-        if (audioCtx && audioCtx.state === 'suspended') {
-            audioCtx.resume();
-        }
     });
 
-    // Si la red se entrecorta y vuelve a cargar búfer, muestra el aviso de nuevo
     audioStream.addEventListener('waiting', () => {
         if (!audioStream.paused) {
             isConnecting = true;
@@ -589,6 +540,16 @@ document.addEventListener('DOMContentLoaded', () => {
             statusText.textContent = 'Conectando...';
             liveBadgeIndicator.classList.remove('active');
         }
+    });
+
+    audioStream.addEventListener('error', () => {
+        isConnecting = false;
+        isPlaying = false;
+        statusText.textContent = 'Error de stream';
+        serverStatusIndicator.style.borderColor = '#ef4444';
+        playIcon.className = 'fa-solid fa-play';
+        stationCoverFrame.classList.remove('playing');
+        liveBadgeIndicator.classList.remove('active');
     });
 
     function startPlayback() {
@@ -602,6 +563,7 @@ document.addEventListener('DOMContentLoaded', () => {
         stationCoverFrame.classList.remove('playing');
         liveBadgeIndicator.classList.remove('active');
 
+        audioStream.volume = volumeSlider.value;
         audioStream.src = station.url;
 
         audioStream.play().catch(err => {
