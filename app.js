@@ -1,319 +1,222 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sol Digital Radio - Rocola Digital</title>
+document.addEventListener('DOMContentLoaded', () => {
+    const audioStream = document.getElementById('audioStream');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const playIcon = document.getElementById('playIcon');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const volumeSlider = document.getElementById('volumeSlider');
+    const serverStatusIndicator = document.getElementById('serverStatusIndicator');
+    const statusText = document.getElementById('statusText');
     
-    <!-- PWA Meta Tags -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#FCD116">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="assets/icon-192.png">
-
-    <!-- Google Fonts & FontAwesome -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    const currentTrackTitle = document.getElementById('currentTrackTitle');
+    const currentTrackCategory = document.getElementById('currentTrackCategory');
+    const currentGenreBadge = document.getElementById('currentGenreBadge');
+    const stationLogoImg = document.getElementById('stationLogoImg');
+    const stationCoverFrame = document.getElementById('stationCoverFrame');
+    const stationsCatalogGrid = document.getElementById('stationsCatalogGrid');
+    const directoryTabsContainer = document.getElementById('directoryTabs') || document.querySelector('.directory-tabs');
+    const liveBadgeIndicator = document.getElementById('liveBadgeIndicator');
     
-    <!-- Estilos -->
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+    const shareAppBtn = document.getElementById('shareAppBtn');
+    const shareAppBtnInternal = document.getElementById('shareAppBtnInternal');
+    const openAdminModalBtn = document.getElementById('openAdminModalBtn');
+    const adminPasswordModal = document.getElementById('adminPasswordModal');
+    const adminPasswordInput = document.getElementById('adminPasswordInput');
+    const submitPasswordBtn = document.getElementById('submitPasswordBtn');
+    const cancelPasswordBtn = document.getElementById('cancelPasswordBtn');
+    
+    const adminDashboardModal = document.getElementById('adminDashboardModal');
+    const closeDashboardBtn = document.getElementById('closeDashboardBtn');
+    const downloadIndexBtn = document.getElementById('downloadIndexBtn');
+    const addStationBtn = document.getElementById('addStationBtn');
+    const inputStationName = document.getElementById('inputStationName');
+    const inputStationCategory = document.getElementById('inputStationCategory');
+    const inputStationGenre = document.getElementById('inputStationGenre');
+    const inputStreamUrl = document.getElementById('inputStreamUrl');
+    const inputStationLogo = document.getElementById('inputStationLogo');
+    const adminStationsList = document.getElementById('adminStationsList');
 
-    <!-- Contenedor General tipo Gabinete de Rocola -->
-    <div class="jukebox-cabinet">
+    // Elementos del Centro de Ayuda e Instalación
+    const openHelpModalBtn = document.getElementById('openHelpModalBtn');
+    const helpDashboardModal = document.getElementById('helpDashboardModal');
+    const closeHelpDashBtn = document.getElementById('closeHelpDashBtn');
+    const deviceTabs = document.querySelectorAll('.device-tab');
+    const instrPanes = document.querySelectorAll('.device-instr-pane');
+    const installAppBtn = document.getElementById('installAppBtn');
+
+    // VERSIÓN DEL CATÁLOGO: Sube este número (v14, v15...) cada vez que edites las emisoras aquí en el código
+    const CATALOG_VERSION = 'sol_stations_v14';
+
+    // Limpia versiones anteriores del almacenamiento local para evitar conflictos
+    Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('sol_stations_') && key !== CATALOG_VERSION) {
+            localStorage.removeItem(key);
+        }
+    });
+
+    // Catálogo Oficial de Emisoras
+    let stations = JSON.parse(localStorage.getItem(CATALOG_VERSION)) || [
+        { 
+            name: "Olímpica Estéreo Barranquilla", 
+            category: "colombia", 
+            genre: "General",
+            url: "https://master.letio.com/io/?gs=9102&type=live.mp3", 
+            logo: "https://static.mytuner.mobi/media/tvos_radios/913/olimpica-stereo-barranquilla-921-fm.a7f8c4c5.png" 
+        },
+        { 
+            name: "Reggaeton 92.3 FM", 
+            category: "republica dominicana", 
+            genre: "Reggaeton",
+            url: "https://streampanel.online/8495/stream", 
+            logo: "https://streampanel.online/img/stream_logos/385.jpg?t=1794636709269" 
+        },
+        { 
+            name: "Mix 103.9 Barranquilla", 
+            category: "colombia", 
+            genre: "General",
+            url: "https://playerservices.streamtheworld.com/api/livestream-redirect/MIX_BARRANQUILLAAAC.aac?dist=oro_web", 
+            logo: "https://static.mytuner.mobi/media/tvos_radios/577/mix-1039-fm.664b9586.jpg" 
+        },
+        { 
+            name: "La Kalle 96.9", 
+            category: "colombia", 
+            genre: "General",
+            url: "https://playerservices.streamtheworld.com/api/livestream-redirect/LA_KALLE.mp3", 
+            logo: "https://thumbnail.anii.io/co/120f8533-a122-11ef-8b9a-60ad4349a14f.webp" 
+        },
+        { 
+            name: "Himnos Cristianos Del Ayer", 
+            category: "colombia", 
+            genre: "cristiana",
+            url: "https://stream.zeno.fm/vkancadp2v8uv", 
+            logo: "https://images.zeno.fm/wuiJiKL-mLyUj54hJGGrjRWahSyjQJzwBC2E5xzmERU/rs:fill:304:304/q:75/g:ce:0:0/aHR0cHM6Ly9wcm94eS56ZW5vLmZtL2NvbnRlbnQvc3RhdGlvbnMvYWd4emZucGxibTh0YzNSaGRITnlNZ3NTQ2tGMWRHaERiR2xsYm5RWWdJQ1FsTEQ5eWdvTUN4SU9VM1JoZEdsdmJsQnliMlpwYkdVWWdJQ3dwcWZwbkFrTW9nRUVlbVZ1YncvaW1hZ2UvP3U9MTY2MTU5MTQ3NjAwMA" 
+        }
+    ];
+
+    let activeStationIndex = 0;
+    let currentFilter = 'all';
+    let isPlaying = false;
+    let isConnecting = false;
+
+    // --- FORMATEO AUTOMÁTICO DE PAÍSES Y BANDERAS ---
+    function formatCategoryLabel(cat) {
+        const normalized = (cat || 'general').trim().toLowerCase();
+        const flagsMap = {
+            'colombia': '🇨🇴 Colombia',
+            'republica dominicana': '🇩🇴 Rep. Dominicana',
+            'república dominicana': '🇩🇴 Rep. Dominicana',
+            'alemania': '🇩🇪 Alemania',
+            'mexico': '🇲🇽 México',
+            'méxico': '🇲🇽 México',
+            'espana': '🇪🇸 España',
+            'españa': '🇪🇸 España',
+            'argentina': '🇦🇷 Argentina',
+            'estados unidos': '🇺🇸 EE. UU.',
+            'usa': '🇺🇸 EE. UU.',
+            'venezuela': '🇻🇪 Venezuela',
+            'peru': '🇵🇪 Perú',
+            'perú': '🇵🇪 Perú',
+            'chile': '🇨🇱 Chile',
+            'ecuador': '🇪🇨 Ecuador',
+            'panama': '🇵🇦 Panamá',
+            'panamá': '🇵🇦 Panamá',
+            'puerto rico': '🇵🇷 Puerto Rico',
+            'brasil': '🇧🇷 Brasil',
+            'francia': '🇫🇷 Francia',
+            'italia': '🇮🇹 Italia',
+            'internacional': '🌎 Internacional'
+        };
+        if (flagsMap[normalized]) return flagsMap[normalized];
         
-        <!-- Pantalla / Cabecera con el Sol-Disco y Satélite en Órbita -->
-        <header class="cabinet-header">
-            <div class="brand-title-group">
-                <div class="solar-logo-container">
-                    <div class="solar-core">
-                        <div class="solar-rays"></div>
-                        <i class="fa-solid fa-compact-disc core-icon"></i>
-                    </div>
-                    <div class="satellite-orbit-path">
-                        <div class="satellite-orbit">
-                            <i class="fa-solid fa-satellite satellite-icon"></i>
-                            <span class="satellite-tail">
-                                <span class="trail-note">♫</span>
-                                <span class="trail-note">♪</span>
-                                <span class="trail-note">♩</span>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="brand-text">
-                    <h1 class="modern-title">Sol Digital Radio</h1>
-                    <span class="subtitle">Rocola Digital <span class="sep">&bull;</span> By <span class="epamar-sig">EPamar</span></span>
-                </div>
-            </div>
-            <div class="server-status-pill" id="serverStatusIndicator">
-                <span class="dot"></span> <span id="statusText">Radios en Sintonía</span>
-            </div>
-        </header>
+        const capitalized = normalized.replace(/\b\w/g, l => l.toUpperCase());
+        return `🌍 ${capitalized}`;
+    }
 
-        <!-- Contenedor Principal (Dashboard PC / Móvil) -->
-        <div class="cabinet-main-layout">
-            
-            <!-- PANEL IZQUIERDO: Consola de Reproducción -->
-            <section class="console-screen-panel">
-                <div class="virtual-screen">
-                    <div class="screen-header-bar">
-                        <span class="screen-brand-label"></span>
-                        <div id="liveBadgeIndicator" class="live-badge-dynamic">
-                            <span class="pulse-dot"></span> LIVE
-                        </div>
-                    </div>
-                    
-                    <div class="screen-content">
-                        <div class="station-cover-frame" id="stationCoverFrame">
-                            <img id="stationLogoImg" src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&auto=format&fit=crop&q=80" alt="Logo Emisora">
-                            <div class="equalizer-overlay">
-                                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
-                            </div>
-                        </div>
+    // --- GENERACIÓN AUTOMÁTICA DE PESTAÑAS DE PAÍSES ---
+    function renderTabs() {
+        if (!directoryTabsContainer) return;
 
-                        <div class="station-info-display">
-                            <h2 id="currentTrackTitle">Selecciona una Emisora</h2>
-                            <p id="currentTrackCategory">Catálogo Sol Digital</p>
-                            <span id="currentGenreBadge" class="genre-tag">Género</span>
-                        </div>
-                    </div>
+        const uniqueCategories = [];
+        stations.forEach(st => {
+            const cat = (st.category || 'colombia').trim().toLowerCase();
+            if (cat && !uniqueCategories.includes(cat)) {
+                uniqueCategories.push(cat);
+            }
+        });
 
-                    <div class="screen-controls-deck">
-                        <div class="volume-box">
-                            <i class="fa-solid fa-volume-low"></i>
-                            <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.8">
-                            <i class="fa-solid fa-volume-high"></i>
-                        </div>
+        if (currentFilter !== 'all' && !uniqueCategories.includes(currentFilter)) {
+            currentFilter = 'all';
+        }
 
-                        <div class="playback-buttons-group">
-                            <button id="prevBtn" class="deck-btn" title="Emisora Anterior"><i class="fa-solid fa-backward-step"></i></button>
-                            <button id="playPauseBtn" class="deck-btn play-main-btn" title="Reproducir / Pausa">
-                                <i class="fa-solid fa-play" id="playIcon"></i>
-                            </button>
-                            <button id="nextBtn" class="deck-btn" title="Emisora Siguiente"><i class="fa-solid fa-forward-step"></i></button>
-                        </div>
-                    </div>
-                </div>
+        directoryTabsContainer.innerHTML = '';
 
-                <!-- Visualizador Gráfico de Sonido Avanzado (Canvas en Vivo) -->
-                <div class="audio-visualizer-container">
-                    <canvas id="audioCanvas"></canvas>
-                </div>
-            </section>
+        // Pestaña "Todas"
+        const allBtn = document.createElement('button');
+        allBtn.className = `dir-tab ${currentFilter === 'all' ? 'active' : ''}`;
+        allBtn.textContent = 'Todas';
+        allBtn.addEventListener('click', () => {
+            currentFilter = 'all';
+            renderTabs();
+            renderCatalog();
+        });
+        directoryTabsContainer.appendChild(allBtn);
 
-            <!-- PANEL DERECHO: Directorio y Selector de Emisoras -->
-            <section class="directory-panel">
-                <div class="directory-tabs" id="directoryTabs">
-                    <!-- Se generan automáticamente según las emisoras cargadas -->
-                </div>
+        // Pestañas dinámicas según los países existentes en el catálogo
+        uniqueCategories.forEach(cat => {
+            const btn = document.createElement('button');
+            btn.className = `dir-tab ${currentFilter === cat ? 'active' : ''}`;
+            btn.textContent = formatCategoryLabel(cat);
+            btn.addEventListener('click', () => {
+                currentFilter = cat;
+                renderTabs();
+                renderCatalog();
+            });
+            directoryTabsContainer.appendChild(btn);
+        });
+    }
 
-                <div class="stations-catalog-grid" id="stationsCatalogGrid">
-                    <!-- Dinámico -->
-                </div>
-            </section>
+    // --- VISUALIZADOR DE AUDIO (HÍBRIDO INTELIGENTE EN VIVO) ---
+    let audioCtx = null;
+    let analyser = null;
+    let sourceNode = null;
+    const canvas = document.getElementById('audioCanvas');
+    const canvasCtx = canvas ? canvas.getContext('2d') : null;
 
-        </div>
+    function initAudioVisualizer() {
+        if (!canvas) return;
+        try {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 64;
+                
+                sourceNode = audioCtx.createMediaElementSource(audioStream);
+                sourceNode.connect(analyser);
+                analyser.connect(audioCtx.destination);
+            }
+        } catch (e) {
+            console.log("Visualizador en modo dinámico alternativo.");
+        }
+    }
 
-        <!-- ZONA INFERIOR: Botones de Instalar, Compartir y Gestionar Radios -->
-        <div class="cabinet-global-actions-bar">
-            <!-- Botón de Instalación Automática (Oculto hasta que el navegador lo permita) -->
-            <button id="installAppBtn" class="install-app-btn-global hidden">
-                <i class="fa-solid fa-download"></i> Instalar Aplicación
-            </button>
-            
-            <button id="shareAppBtn" class="share-app-btn-global">
-                <i class="fa-solid fa-share-nodes"></i> Compartir esta App con amigos
-            </button>
-            
-            <button id="openAdminModalBtn" class="hidden-admin-trigger-global">
-                <i class="fa-solid fa-lock"></i> Gestionar Radios
-            </button>
-        </div>
+    function drawVisualizer() {
+        if (!canvas || !canvasCtx) return;
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+        
+        const width = canvas.width;
+        const height = canvas.height;
+        canvasCtx.clearRect(0, 0, width, height);
 
-        <!-- Franja Tricolor de Colombia -->
-        <div class="colombia-flag-bar">
-            <div class="stripe yellow"></div>
-            <div class="stripe blue"></div>
-            <div class="stripe red"></div>
-        </div>
+        let freqData = new Uint8Array(analyser ? analyser.frequencyBinCount : 32);
 
-        <!-- Firma Oficial Inferior -->
-        <footer class="cabinet-footer">
-            <div class="signature-content">
-                <span class="brand-signature">Sol Digital Solutions <span class="by-text">by</span> <span class="epamar-text">EPamar</span></span>
-                <p class="copyright">&copy; 2025 - 2026 &bull; Todos los derechos reservados</p>
-            </div>
-        </footer>
+        if (isPlaying) {
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
 
-    </div>
-
-    <!-- BOTÓN FLOTANTE DE AYUDA (Esquina Inferior Derecha) -->
-    <button id="openHelpModalBtn" class="floating-help-pill" title="Centro de Ayuda e Instalación">
-        <i class="fa-solid fa-sun sun-ic"></i>
-        <span>¿Ayuda?</span>
-        <i class="fa-solid fa-radio radio-ic"></i>
-    </button>
-
-    <!-- MODAL DE CONTRASEÑA -->
-    <div id="adminPasswordModal" class="admin-modal hidden">
-        <div class="admin-card auth-box">
-            <h3><i class="fa-solid fa-lock"></i> Seguridad de Acceso</h3>
-            <p class="desc">Ingresa la contraseña para acceder al panel de administración.</p>
-            <div class="form-group">
-                <input type="password" id="adminPasswordInput" placeholder="Contraseña...">
-            </div>
-            <div class="admin-actions">
-                <button id="submitPasswordBtn" class="btn-primary">Ingresar</button>
-                <button id="cancelPasswordBtn" class="btn-secondary">Cancelar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- PANEL DE AYUDA E INSTALACIÓN (MODAL CLARO Y LEGIBLE) -->
-    <div id="helpDashboardModal" class="admin-modal hidden">
-        <div class="admin-dashboard-container help-dash-style">
-            <div class="dashboard-top-bar help-dash-top">
-                <h3><i class="fa-solid fa-sun"></i> Centro de Ayuda Sol Digital</h3>
-                <button id="closeHelpDashBtn" class="close-dash-btn"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-
-            <div class="dashboard-grid-split help-grid-split">
-                <!-- Columna de Bienvenida -->
-                <div class="welcome-message-card">
-                    <div class="welcome-icons-head">
-                        <i class="fa-solid fa-sun"></i>
-                        <i class="fa-solid fa-radio"></i>
-                    </div>
-                    <h4>¡Bienvenid@ a Sol Digital Radio!</h4>
-                    <p>Comparte nuestra rocola con tus amigos o descubre cómo instalar la App paso a paso en tu dispositivo.</p>
-                    <button id="shareAppBtnInternal" class="share-app-btn-internal">
-                        <i class="fa-solid fa-share-nodes"></i> Compartir esta App con amigos
-                    </button>
-                </div>
-
-                <!-- Columna de Instrucciones Interactivas -->
-                <div class="help-instructions-box">
-                    <h4><i class="fa-solid fa-mobile-screen-button"></i> ¿Cómo tener la App en tu celular o PC?</h4>
-                    
-                    <!-- Pestañas de Dispositivos -->
-                    <div class="device-selector-tabs">
-                        <button class="device-tab active" data-device="iphone">
-                            <i class="fab fa-apple"></i> iPhone
-                        </button>
-                        <button class="device-tab" data-device="android">
-                            <i class="fab fa-android"></i> Android
-                        </button>
-                        <button class="device-tab" data-device="pc">
-                            <i class="fas fa-desktop"></i> PC
-                        </button>
-                    </div>
-
-                    <!-- Contenido dinámico por dispositivo -->
-                    <div id="deviceInstructionsContent" class="instructions-display-area">
-                        <!-- iPhone -->
-                        <div class="device-instr-pane active" id="instr-iphone">
-                            <ol class="steps-list">
-                                <li>Toca el icono de <b>Compartir</b> <i class="fa-solid fa-arrow-up-from-bracket"></i> en la barra inferior de Safari.</li>
-                                <li>Desliza las opciones y selecciona <b>"Agregar a inicio"</b> <i class="fa-regular fa-square-plus"></i>.</li>
-                                <li>Toca <b>"Agregar"</b> arriba a la derecha. ¡Listo!</li>
-                            </ol>
-                        </div>
-                        <!-- Android -->
-                        <div class="device-instr-pane" id="instr-android">
-                            <ol class="steps-list">
-                                <li>En Google Chrome, abre el menú de opciones (tres puntos) <i class="fa-solid fa-ellipsis-vertical"></i>.</li>
-                                <li>Selecciona <b>"Instalar aplicación"</b> o <b>"Añadir a pantalla de inicio"</b>.</li>
-                                <li>Confirma la instalación. ¡Listo!</li>
-                            </ol>
-                        </div>
-                        <!-- PC -->
-                        <div class="device-instr-pane" id="instr-pc">
-                            <ol class="steps-list">
-                                <li>En la barra de direcciones de Chrome/Edge, busca el icono de instalación <i class="fa-solid fa-desktop"></i> <i class="fa-solid fa-download"></i>.</li>
-                                <li>Haz clic en él y confirma la instalación.</li>
-                                <li>¡Tendrás un acceso directo independiente en tu escritorio!</li>
-                            </ol>
-                        </div>
-                    </div>
-
-                    <p class="app-footer-note">App ligera, libre de virus y no ocupa memoria.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- PANEL DE ADMINISTRACIÓN / GESTOR DE RADIOS -->
-    <div id="adminDashboardModal" class="admin-modal hidden">
-        <div class="admin-dashboard-container">
-            <div class="dashboard-top-bar">
-                <h3><i class="fa-solid fa-sliders"></i> Panel de Gestión de Radios</h3>
-                <button id="closeDashboardBtn" class="close-dash-btn"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-
-            <div class="github-export-banner">
-                <div class="github-export-info">
-                    <i class="fa-solid fa-download"></i>
-                    <div>
-                        <strong>Guardar para GitHub</strong>
-                        <p>Descarga el index.html listo para subir.</p>
-                    </div>
-                </div>
-                <button id="downloadIndexBtn" class="btn-download-gh">
-                    <i class="fa-solid fa-code"></i> Descargar
-                </button>
-            </div>
-
-            <div class="dashboard-grid-split">
-                <div class="add-station-form-card">
-                    <h4><i class="fa-solid fa-plus-circle"></i> Nueva Radio</h4>
-                    <div class="form-group">
-                        <label>Nombre</label>
-                        <input type="text" id="inputStationName" placeholder="Ej: Tropicana">
-                    </div>
-                    <div class="form-group">
-                        <label>País / Nacionalidad</label>
-                        <input type="text" id="inputStationCategory" list="countriesList" placeholder="Ej: Colombia, México, España...">
-                        <datalist id="countriesList">
-                            <option value="Colombia">
-                            <option value="República Dominicana">
-                            <option value="México">
-                            <option value="Estados Unidos">
-                            <option value="España">
-                            <option value="Argentina">
-                            <option value="Venezuela">
-                            <option value="Internacional">
-                        </datalist>
-                    </div>
-                    <div class="form-group">
-                        <label>Género Musical</label>
-                        <input type="text" id="inputStationGenre" placeholder="Ej: Salsa / Pop">
-                    </div>
-                    <div class="form-group">
-                        <label>Enlace Stream (HTTPS)</label>
-                        <input type="url" id="inputStreamUrl" placeholder="https://...">
-                    </div>
-                    <div class="form-group">
-                        <label>Portada URL</label>
-                        <input type="url" id="inputStationLogo" placeholder="https://...">
-                    </div>
-                    <button id="addStationBtn" class="btn-primary full-btn">Agregar Radio</button>
-                </div>
-
-                <div class="configure-stations-card">
-                    <h4><i class="fa-solid fa-pen-to-square"></i> Configurar Enlaces y Portadas</h4>
-                    <div id="adminStationsList" class="admin-stations-scroll">
-                        <!-- Dinámico -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Audio Oculto (sin crossorigin para permitir streams externos) -->
-    <audio id="audioStream" preload="none"></audio>
-    <script src="app.js"></script>
-</body>
-</html>
+            let hasRealData = false;
+            if (analyser) {
+                try {
+                    analyser.getByteFrequencyData(freq
