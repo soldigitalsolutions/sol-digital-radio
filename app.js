@@ -1,569 +1,319 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const audioStream = document.getElementById('audioStream');
-    const playPauseBtn = document.getElementById('playPauseBtn');
-    const playIcon = document.getElementById('playIcon');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const volumeSlider = document.getElementById('volumeSlider');
-    const serverStatusIndicator = document.getElementById('serverStatusIndicator');
-    const statusText = document.getElementById('statusText');
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sol Digital Radio - Rocola Digital</title>
     
-    const currentTrackTitle = document.getElementById('currentTrackTitle');
-    const currentTrackCategory = document.getElementById('currentTrackCategory');
-    const currentGenreBadge = document.getElementById('currentGenreBadge');
-    const stationLogoImg = document.getElementById('stationLogoImg');
-    const stationCoverFrame = document.getElementById('stationCoverFrame');
-    const stationsCatalogGrid = document.getElementById('stationsCatalogGrid');
-    const liveBadgeIndicator = document.getElementById('liveBadgeIndicator');
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#FCD116">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="assets/icon-192.png">
+
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    const shareAppBtn = document.getElementById('shareAppBtn');
-    const shareAppBtnInternal = document.getElementById('shareAppBtnInternal');
-    const openAdminModalBtn = document.getElementById('openAdminModalBtn');
-    const adminPasswordModal = document.getElementById('adminPasswordModal');
-    const adminPasswordInput = document.getElementById('adminPasswordInput');
-    const submitPasswordBtn = document.getElementById('submitPasswordBtn');
-    const cancelPasswordBtn = document.getElementById('cancelPasswordBtn');
-    
-    const adminDashboardModal = document.getElementById('adminDashboardModal');
-    const closeDashboardBtn = document.getElementById('closeDashboardBtn');
-    const downloadIndexBtn = document.getElementById('downloadIndexBtn');
-    const addStationBtn = document.getElementById('addStationBtn');
-    const inputStationName = document.getElementById('inputStationName');
-    const inputStationCategory = document.getElementById('inputStationCategory');
-    const inputStationGenre = document.getElementById('inputStationGenre');
-    const inputStreamUrl = document.getElementById('inputStreamUrl');
-    const inputStationLogo = document.getElementById('inputStationLogo');
-    const adminStationsList = document.getElementById('adminStationsList');
-    const dirTabs = document.querySelectorAll('.dir-tab');
+    <!-- Estilos -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-    // Elementos del Centro de Ayuda e Instalación
-    const openHelpModalBtn = document.getElementById('openHelpModalBtn');
-    const helpDashboardModal = document.getElementById('helpDashboardModal');
-    const closeHelpDashBtn = document.getElementById('closeHelpDashBtn');
-    const deviceTabs = document.querySelectorAll('.device-tab');
-    const instrPanes = document.querySelectorAll('.device-instr-pane');
-    const installAppBtn = document.getElementById('installAppBtn');
-
-    // VERSIÓN DEL CATÁLOGO: Sube este número (v12, v13...) cada vez que edites las emisoras aquí en el código
-    const CATALOG_VERSION = 'sol_stations_v12';
-
-    // Limpia versiones anteriores del almacenamiento local para evitar conflictos
-    Object.keys(localStorage).forEach(key => {
-        if (key.startsWith('sol_stations_') && key !== CATALOG_VERSION) {
-            localStorage.removeItem(key);
-        }
-    });
-
-    // Catálogo Oficial de Emisoras
-    let stations = JSON.parse(localStorage.getItem(CATALOG_VERSION)) || [
-        { 
-            name: "Olímpica Estéreo Barranquilla", 
-            category: "colombia", 
-            genre: "General",
-            url: "https://master.letio.com/io/?gs=9102&type=live.mp3", 
-            logo: "https://static.mytuner.mobi/media/tvos_radios/913/olimpica-stereo-barranquilla-921-fm.a7f8c4c5.png" 
-        },
-        { 
-            name: "Reggaeton 92.3 FM", 
-            category: "republica dominicana", 
-            genre: "Reggaeton",
-            url: "https://streampanel.online/8495/stream", 
-            logo: "https://streampanel.online/img/stream_logos/385.jpg?t=1794636709269" 
-        },
-        { 
-            name: "Mix 103.9 Barranquilla", 
-            category: "colombia", 
-            genre: "General",
-            url: "https://playerservices.streamtheworld.com/api/livestream-redirect/MIX_BARRANQUILLAAAC.aac?dist=oro_web", 
-            logo: "https://static.mytuner.mobi/media/tvos_radios/577/mix-1039-fm.664b9586.jpg" 
-        },
-        { 
-            name: "La Kalle 96.9", 
-            category: "colombia", 
-            genre: "General",
-            url: "https://playerservices.streamtheworld.com/api/livestream-redirect/LA_KALLE.mp3", 
-            logo: "https://thumbnail.anii.io/co/120f8533-a122-11ef-8b9a-60ad4349a14f.webp" 
-        },
-        { 
-            name: "Himnos Cristianos Del Ayer", 
-            category: "colombia", 
-            genre: "cristiana",
-            url: "https://stream.zeno.fm/vkancadp2v8uv", 
-            logo: "https://images.zeno.fm/wuiJiKL-mLyUj54hJGGrjRWahSyjQJzwBC2E5xzmERU/rs:fill:304:304/q:75/g:ce:0:0/aHR0cHM6Ly9wcm94eS56ZW5vLmZtL2NvbnRlbnQvc3RhdGlvbnMvYWd4emZucGxibTh0YzNSaGRITnlNZ3NTQ2tGMWRHaERiR2xsYm5RWWdJQ1FsTEQ5eWdvTUN4SU9VM1JoZEdsdmJsQnliMlpwYkdVWWdJQ3dwcWZwbkFrTW9nRUVlbVZ1YncvaW1hZ2UvP3U9MTY2MTU5MTQ3NjAwMA" 
-        }
-    ];
-
-    let activeStationIndex = 0;
-    let currentFilter = 'all';
-    let isPlaying = false;
-    let isConnecting = false;
-
-    // --- VISUALIZADOR DE AUDIO (HÍBRIDO INTELIGENTE EN VIVO) ---
-    let audioCtx = null;
-    let analyser = null;
-    let sourceNode = null;
-    const canvas = document.getElementById('audioCanvas');
-    const canvasCtx = canvas ? canvas.getContext('2d') : null;
-
-    function initAudioVisualizer() {
-        if (!canvas) return;
-        try {
-            if (!audioCtx) {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                audioCtx = new AudioContext();
-                analyser = audioCtx.createAnalyser();
-                analyser.fftSize = 64;
-                
-                sourceNode = audioCtx.createMediaElementSource(audioStream);
-                sourceNode.connect(analyser);
-                analyser.connect(audioCtx.destination);
-            }
-        } catch (e) {
-            console.log("Visualizador en modo dinámico alternativo.");
-        }
-    }
-
-    function drawVisualizer() {
-        if (!canvas || !canvasCtx) return;
-        canvas.width = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
+    <!-- Contenedor General tipo Gabinete de Rocola -->
+    <div class="jukebox-cabinet">
         
-        const width = canvas.width;
-        const height = canvas.height;
-        canvasCtx.clearRect(0, 0, width, height);
+        <!-- Pantalla / Cabecera con el Sol-Disco y Satélite en Órbita -->
+        <header class="cabinet-header">
+            <div class="brand-title-group">
+                <div class="solar-logo-container">
+                    <div class="solar-core">
+                        <div class="solar-rays"></div>
+                        <i class="fa-solid fa-compact-disc core-icon"></i>
+                    </div>
+                    <div class="satellite-orbit-path">
+                        <div class="satellite-orbit">
+                            <i class="fa-solid fa-satellite satellite-icon"></i>
+                            <span class="satellite-tail">
+                                <span class="trail-note">♫</span>
+                                <span class="trail-note">♪</span>
+                                <span class="trail-note">♩</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="brand-text">
+                    <h1 class="modern-title">Sol Digital Radio</h1>
+                    <span class="subtitle">Rocola Digital <span class="sep">&bull;</span> By <span class="epamar-sig">EPamar</span></span>
+                </div>
+            </div>
+            <div class="server-status-pill" id="serverStatusIndicator">
+                <span class="dot"></span> <span id="statusText">Radios en Sintonía</span>
+            </div>
+        </header>
 
-        let freqData = new Uint8Array(analyser ? analyser.frequencyBinCount : 32);
-
-        if (isPlaying) {
-            if (audioCtx && audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-
-            let hasRealData = false;
-            if (analyser) {
-                try {
-                    analyser.getByteFrequencyData(freqData);
-                    hasRealData = freqData.some(val => val > 0);
-                } catch (err) {
-                    hasRealData = false;
-                }
-            }
-
-            if (!hasRealData) {
-                for (let i = 0; i < freqData.length; i++) {
-                    let wave = Math.sin(Date.now() / 120 + (i * 0.4)) * 110 + 70;
-                    let noise = Math.random() * 50;
-                    freqData[i] = Math.min(255, Math.abs(wave + noise));
-                }
-            }
-
-            const barWidth = (width / freqData.length) * 1.8;
-            let x = 0;
-
-            for (let i = 0; i < freqData.length; i++) {
-                const barHeight = (freqData[i] / 255) * height * 0.95;
-                
-                let gradient = canvasCtx.createLinearGradient(0, height, 0, 0);
-                gradient.addColorStop(0, '#FCD116');
-                gradient.addColorStop(0.5, '#38bdf8');
-                gradient.addColorStop(1, '#a855f7');
-
-                canvasCtx.fillStyle = gradient;
-                canvasCtx.shadowBlur = 12;
-                canvasCtx.shadowColor = '#FCD116';
-                canvasCtx.fillRect(x, height - barHeight, barWidth - 2, barHeight);
-
-                x += barWidth + 2;
-            }
-        } else if (isConnecting) {
-            const pulse = (Math.sin(Date.now() / 220) + 1) / 2;
+        <!-- Contenedor Principal (Dashboard PC / Móvil) -->
+        <div class="cabinet-main-layout">
             
-            canvasCtx.fillStyle = `rgba(56, 189, 248, ${0.12 + pulse * 0.2})`;
-            canvasCtx.shadowBlur = 0;
-            canvasCtx.fillRect(0, height / 2 - 1, width, 2);
-
-            canvasCtx.font = "600 13px 'Poppins', sans-serif";
-            canvasCtx.fillStyle = `rgba(252, 209, 22, ${0.65 + pulse * 0.35})`;
-            canvasCtx.textAlign = "center";
-            canvasCtx.textBaseline = "middle";
-            canvasCtx.shadowBlur = 8;
-            canvasCtx.shadowColor = "rgba(252, 209, 22, 0.35)";
-            canvasCtx.fillText("Estableciendo conexión...", width / 2, height / 2);
-        } else {
-            canvasCtx.fillStyle = '#2a3b5c';
-            canvasCtx.shadowBlur = 0;
-            canvasCtx.fillRect(0, height / 2 - 1, width, 2);
-        }
-        requestAnimationFrame(drawVisualizer);
-    }
-
-    if (canvas) {
-        drawVisualizer();
-    }
-
-    // --- LÓGICA DE INSTALACIÓN PWA ---
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        if (installAppBtn) installAppBtn.classList.remove('hidden');
-    });
-
-    if (installAppBtn) {
-        installAppBtn.addEventListener('click', async () => {
-            if (!deferredPrompt) return;
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                installAppBtn.classList.add('hidden');
-            }
-            deferredPrompt = null;
-        });
-    }
-
-    window.addEventListener('appinstalled', () => {
-        if (installAppBtn) installAppBtn.classList.add('hidden');
-    });
-
-    // --- LÓGICA DEL CENTRO DE AYUDA ---
-    if (openHelpModalBtn) {
-        openHelpModalBtn.addEventListener('click', () => {
-            if (helpDashboardModal) {
-                helpDashboardModal.classList.remove('hidden');
-                switchDeviceTab('iphone');
-            }
-        });
-    }
-
-    if (closeHelpDashBtn) {
-        closeHelpDashBtn.addEventListener('click', () => {
-            if (helpDashboardModal) helpDashboardModal.classList.add('hidden');
-        });
-    }
-
-    function switchDeviceTab(device) {
-        deviceTabs.forEach(t => t.classList.remove('active'));
-        instrPanes.forEach(p => p.classList.remove('active'));
-        
-        const selectedTab = document.querySelector(`.device-tab[data-device="${device}"]`);
-        const selectedPane = document.getElementById(`instr-${device}`);
-        
-        if (selectedTab) selectedTab.classList.add('active');
-        if (selectedPane) selectedPane.classList.add('active');
-    }
-
-    deviceTabs.forEach(tab => {
-        tab.addEventListener('click', (e) => {
-            const device = e.currentTarget.getAttribute('data-device');
-            switchDeviceTab(device);
-        });
-    });
-
-    // --- COMPARTIR APP ---
-    function triggerShare() {
-        if (navigator.share) {
-            navigator.share({
-                title: 'Sol Digital Radio',
-                text: '¡Escucha las mejores emisoras en Sol Digital Radio!',
-                url: window.location.href
-            }).catch(() => {});
-        } else {
-            navigator.clipboard.writeText(window.location.href);
-            alert('¡Enlace copiado al portapapeles!');
-        }
-    }
-
-    if (shareAppBtn) shareAppBtn.addEventListener('click', triggerShare);
-    if (shareAppBtnInternal) shareAppBtnInternal.addEventListener('click', triggerShare);
-
-    // --- GESTIÓN DE EMISORAS Y CATÁLOGO ---
-    function renderCatalog() {
-        stationsCatalogGrid.innerHTML = '';
-        stations.forEach((station, index) => {
-            if (currentFilter !== 'all' && station.category !== currentFilter) return;
-
-            const card = document.createElement('div');
-            card.className = `station-card-item ${index === activeStationIndex ? 'active' : ''}`;
-            card.innerHTML = `
-                <div class="station-card-thumb">
-                    <img src="${station.logo || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&auto=format&fit=crop&q=80'}" alt="${station.name}">
-                </div>
-                <div class="station-card-title">${station.name}</div>
-                <div class="station-card-genre">${station.genre || 'General'}</div>
-            `;
-
-            card.addEventListener('click', () => {
-                activeStationIndex = index;
-                updateActiveStation();
-                startPlayback();
-            });
-
-            stationsCatalogGrid.appendChild(card);
-        });
-    }
-
-    function updateActiveStation() {
-        const station = stations[activeStationIndex];
-        if (!station) return;
-
-        currentTrackTitle.textContent = station.name;
-        currentTrackCategory.textContent = `Nacionalidad: ${station.category.toUpperCase()}`;
-        currentGenreBadge.textContent = station.genre || 'General';
-        stationLogoImg.src = station.logo || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&auto=format&fit=crop&q=80';
-        
-        renderCatalog();
-    }
-
-    function renderAdminList() {
-        adminStationsList.innerHTML = '';
-        stations.forEach((station, index) => {
-            const row = document.createElement('div');
-            row.className = 'admin-station-row';
-            row.innerHTML = `
-                <div class="admin-station-row-top">
-                    <span class="admin-station-name">ID: ${index + 1} - ${station.name}</span>
-                    <button class="btn-danger delete-btn" data-index="${index}"><i class="fa-solid fa-trash"></i></button>
-                </div>
-                <div class="form-group" style="margin-bottom:4px;">
-                    <label>Nombre</label>
-                    <input type="text" class="edit-name" data-index="${index}" value="${station.name}">
-                </div>
-                <div class="admin-station-inputs">
-                    <div class="form-group" style="margin-bottom:4px;">
-                        <label>Nacionalidad</label>
-                        <select class="styled-select edit-cat" data-index="${index}">
-                            <option value="colombia" ${station.category === 'colombia' ? 'selected' : ''}>Colombia</option>
-                            <option value="alemania" ${station.category === 'alemania' ? 'selected' : ''}>Alemania</option>
-                            <option value="republica dominicana" ${station.category === 'republica dominicana' ? 'selected' : ''}>República Dominicana</option>
-                            <option value="internacional" ${station.category === 'internacional' ? 'selected' : ''}>Internacional</option>
-                        </select>
+            <!-- PANEL IZQUIERDO: Consola de Reproducción -->
+            <section class="console-screen-panel">
+                <div class="virtual-screen">
+                    <div class="screen-header-bar">
+                        <span class="screen-brand-label"></span>
+                        <div id="liveBadgeIndicator" class="live-badge-dynamic">
+                            <span class="pulse-dot"></span> LIVE
+                        </div>
                     </div>
-                    <div class="form-group" style="margin-bottom:4px;">
-                        <label>Género</label>
-                        <input type="text" class="edit-genre" data-index="${index}" value="${station.genre || ''}">
+                    
+                    <div class="screen-content">
+                        <div class="station-cover-frame" id="stationCoverFrame">
+                            <img id="stationLogoImg" src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&auto=format&fit=crop&q=80" alt="Logo Emisora">
+                            <div class="equalizer-overlay">
+                                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                            </div>
+                        </div>
+
+                        <div class="station-info-display">
+                            <h2 id="currentTrackTitle">Selecciona una Emisora</h2>
+                            <p id="currentTrackCategory">Catálogo Sol Digital</p>
+                            <span id="currentGenreBadge" class="genre-tag">Género</span>
+                        </div>
+                    </div>
+
+                    <div class="screen-controls-deck">
+                        <div class="volume-box">
+                            <i class="fa-solid fa-volume-low"></i>
+                            <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.8">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </div>
+
+                        <div class="playback-buttons-group">
+                            <button id="prevBtn" class="deck-btn" title="Emisora Anterior"><i class="fa-solid fa-backward-step"></i></button>
+                            <button id="playPauseBtn" class="deck-btn play-main-btn" title="Reproducir / Pausa">
+                                <i class="fa-solid fa-play" id="playIcon"></i>
+                            </button>
+                            <button id="nextBtn" class="deck-btn" title="Emisora Siguiente"><i class="fa-solid fa-forward-step"></i></button>
+                        </div>
                     </div>
                 </div>
-                <div class="form-group" style="margin-bottom:4px;">
-                    <label>Enlace Stream URL</label>
-                    <input type="url" class="edit-url" data-index="${index}" value="${station.url}">
+
+                <!-- Visualizador Gráfico de Sonido Avanzado (Canvas en Vivo) -->
+                <div class="audio-visualizer-container">
+                    <canvas id="audioCanvas"></canvas>
                 </div>
-                <div class="form-group" style="margin-bottom:4px;">
-                    <label>Portada URL</label>
-                    <input type="url" class="edit-logo" data-index="${index}" value="${station.logo || ''}">
+            </section>
+
+            <!-- PANEL DERECHO: Directorio y Selector de Emisoras -->
+            <section class="directory-panel">
+                <div class="directory-tabs" id="directoryTabs">
+                    <!-- Se generan automáticamente según las emisoras cargadas -->
                 </div>
-                <button class="btn-primary save-station-btn" data-index="${index}"><i class="fa-solid fa-floppy-disk"></i> Guardar</button>
-            `;
-            adminStationsList.appendChild(row);
-        });
 
-        adminStationsList.querySelectorAll('.save-station-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const idx = e.currentTarget.getAttribute('data-index');
-                stations[idx].name = adminStationsList.querySelector(`.edit-name[data-index="${idx}"]`).value;
-                stations[idx].category = adminStationsList.querySelector(`.edit-cat[data-index="${idx}"]`).value;
-                stations[idx].genre = adminStationsList.querySelector(`.edit-genre[data-index="${idx}"]`).value;
-                stations[idx].url = adminStationsList.querySelector(`.edit-url[data-index="${idx}"]`).value;
-                stations[idx].logo = adminStationsList.querySelector(`.edit-logo[data-index="${idx}"]`).value;
+                <div class="stations-catalog-grid" id="stationsCatalogGrid">
+                    <!-- Dinámico -->
+                </div>
+            </section>
 
-                localStorage.setItem(CATALOG_VERSION, JSON.stringify(stations));
-                renderCatalog();
-                updateActiveStation();
-                alert('¡Radio actualizada con éxito!');
-            });
-        });
+        </div>
 
-        adminStationsList.querySelectorAll('.delete-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const idx = e.currentTarget.getAttribute('data-index');
-                if (confirm(`¿Eliminar la radio "${stations[idx].name}"?`)) {
-                    stations.splice(idx, 1);
-                    localStorage.setItem(CATALOG_VERSION, JSON.stringify(stations));
-                    renderCatalog();
-                    updateActiveStation();
-                    renderAdminList();
-                }
-            });
-        });
-    }
+        <!-- ZONA INFERIOR: Botones de Instalar, Compartir y Gestionar Radios -->
+        <div class="cabinet-global-actions-bar">
+            <!-- Botón de Instalación Automática (Oculto hasta que el navegador lo permita) -->
+            <button id="installAppBtn" class="install-app-btn-global hidden">
+                <i class="fa-solid fa-download"></i> Instalar Aplicación
+            </button>
+            
+            <button id="shareAppBtn" class="share-app-btn-global">
+                <i class="fa-solid fa-share-nodes"></i> Compartir esta App con amigos
+            </button>
+            
+            <button id="openAdminModalBtn" class="hidden-admin-trigger-global">
+                <i class="fa-solid fa-lock"></i> Gestionar Radios
+            </button>
+        </div>
 
-    dirTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            dirTabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            currentFilter = tab.getAttribute('data-category');
-            renderCatalog();
-        });
-    });
+        <!-- Franja Tricolor de Colombia -->
+        <div class="colombia-flag-bar">
+            <div class="stripe yellow"></div>
+            <div class="stripe blue"></div>
+            <div class="stripe red"></div>
+        </div>
 
-    openAdminModalBtn.addEventListener('click', () => {
-        adminPasswordInput.value = '';
-        adminPasswordModal.classList.remove('hidden');
-    });
+        <!-- Firma Oficial Inferior -->
+        <footer class="cabinet-footer">
+            <div class="signature-content">
+                <span class="brand-signature">Sol Digital Solutions <span class="by-text">by</span> <span class="epamar-text">EPamar</span></span>
+                <p class="copyright">&copy; 2025 - 2026 &bull; Todos los derechos reservados</p>
+            </div>
+        </footer>
 
-    cancelPasswordBtn.addEventListener('click', () => {
-        adminPasswordModal.classList.add('hidden');
-    });
+    </div>
 
-    submitPasswordBtn.addEventListener('click', () => {
-        if (adminPasswordInput.value === 'Solradio2026.') {
-            adminPasswordModal.classList.add('hidden');
-            renderAdminList();
-            adminDashboardModal.classList.remove('hidden');
-        } else {
-            alert('Contraseña incorrecta.');
-        }
-    });
+    <!-- BOTÓN FLOTANTE DE AYUDA (Esquina Inferior Derecha) -->
+    <button id="openHelpModalBtn" class="floating-help-pill" title="Centro de Ayuda e Instalación">
+        <i class="fa-solid fa-sun sun-ic"></i>
+        <span>¿Ayuda?</span>
+        <i class="fa-solid fa-radio radio-ic"></i>
+    </button>
 
-    closeDashboardBtn.addEventListener('click', () => {
-        adminDashboardModal.classList.add('hidden');
-    });
+    <!-- MODAL DE CONTRASEÑA -->
+    <div id="adminPasswordModal" class="admin-modal hidden">
+        <div class="admin-card auth-box">
+            <h3><i class="fa-solid fa-lock"></i> Seguridad de Acceso</h3>
+            <p class="desc">Ingresa la contraseña para acceder al panel de administración.</p>
+            <div class="form-group">
+                <input type="password" id="adminPasswordInput" placeholder="Contraseña...">
+            </div>
+            <div class="admin-actions">
+                <button id="submitPasswordBtn" class="btn-primary">Ingresar</button>
+                <button id="cancelPasswordBtn" class="btn-secondary">Cancelar</button>
+            </div>
+        </div>
+    </div>
 
-    downloadIndexBtn.addEventListener('click', () => {
-        adminDashboardModal.classList.add('hidden');
-        adminPasswordModal.classList.add('hidden');
-        adminStationsList.innerHTML = ''; 
+    <!-- PANEL DE AYUDA E INSTALACIÓN (MODAL CLARO Y LEGIBLE) -->
+    <div id="helpDashboardModal" class="admin-modal hidden">
+        <div class="admin-dashboard-container help-dash-style">
+            <div class="dashboard-top-bar help-dash-top">
+                <h3><i class="fa-solid fa-sun"></i> Centro de Ayuda Sol Digital</h3>
+                <button id="closeHelpDashBtn" class="close-dash-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
 
-        const htmlContent = document.documentElement.outerHTML;
-        renderAdminList();
+            <div class="dashboard-grid-split help-grid-split">
+                <!-- Columna de Bienvenida -->
+                <div class="welcome-message-card">
+                    <div class="welcome-icons-head">
+                        <i class="fa-solid fa-sun"></i>
+                        <i class="fa-solid fa-radio"></i>
+                    </div>
+                    <h4>¡Bienvenid@ a Sol Digital Radio!</h4>
+                    <p>Comparte nuestra rocola con tus amigos o descubre cómo instalar la App paso a paso en tu dispositivo.</p>
+                    <button id="shareAppBtnInternal" class="share-app-btn-internal">
+                        <i class="fa-solid fa-share-nodes"></i> Compartir esta App con amigos
+                    </button>
+                </div>
 
-        const blob = new Blob([htmlContent], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'index.html';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        alert('¡Archivo index.html descargado limpio y listo para GitHub!');
-    });
+                <!-- Columna de Instrucciones Interactivas -->
+                <div class="help-instructions-box">
+                    <h4><i class="fa-solid fa-mobile-screen-button"></i> ¿Cómo tener la App en tu celular o PC?</h4>
+                    
+                    <!-- Pestañas de Dispositivos -->
+                    <div class="device-selector-tabs">
+                        <button class="device-tab active" data-device="iphone">
+                            <i class="fab fa-apple"></i> iPhone
+                        </button>
+                        <button class="device-tab" data-device="android">
+                            <i class="fab fa-android"></i> Android
+                        </button>
+                        <button class="device-tab" data-device="pc">
+                            <i class="fas fa-desktop"></i> PC
+                        </button>
+                    </div>
 
-    addStationBtn.addEventListener('click', () => {
-        const name = inputStationName.value.trim();
-        const category = inputStationCategory.value;
-        const genre = inputStationGenre.value.trim();
-        const url = inputStreamUrl.value.trim();
-        const logo = inputStationLogo.value.trim();
+                    <!-- Contenido dinámico por dispositivo -->
+                    <div id="deviceInstructionsContent" class="instructions-display-area">
+                        <!-- iPhone -->
+                        <div class="device-instr-pane active" id="instr-iphone">
+                            <ol class="steps-list">
+                                <li>Toca el icono de <b>Compartir</b> <i class="fa-solid fa-arrow-up-from-bracket"></i> en la barra inferior de Safari.</li>
+                                <li>Desliza las opciones y selecciona <b>"Agregar a inicio"</b> <i class="fa-regular fa-square-plus"></i>.</li>
+                                <li>Toca <b>"Agregar"</b> arriba a la derecha. ¡Listo!</li>
+                            </ol>
+                        </div>
+                        <!-- Android -->
+                        <div class="device-instr-pane" id="instr-android">
+                            <ol class="steps-list">
+                                <li>En Google Chrome, abre el menú de opciones (tres puntos) <i class="fa-solid fa-ellipsis-vertical"></i>.</li>
+                                <li>Selecciona <b>"Instalar aplicación"</b> o <b>"Añadir a pantalla de inicio"</b>.</li>
+                                <li>Confirma la instalación. ¡Listo!</li>
+                            </ol>
+                        </div>
+                        <!-- PC -->
+                        <div class="device-instr-pane" id="instr-pc">
+                            <ol class="steps-list">
+                                <li>En la barra de direcciones de Chrome/Edge, busca el icono de instalación <i class="fa-solid fa-desktop"></i> <i class="fa-solid fa-download"></i>.</li>
+                                <li>Haz clic en él y confirma la instalación.</li>
+                                <li>¡Tendrás un acceso directo independiente en tu escritorio!</li>
+                            </ol>
+                        </div>
+                    </div>
 
-        if (!name || !url) {
-            alert('Por favor completa al menos el nombre y la URL del stream.');
-            return;
-        }
+                    <p class="app-footer-note">App ligera, libre de virus y no ocupa memoria.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        stations.push({
-            name,
-            category,
-            genre: genre || 'General',
-            url,
-            logo: logo || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&auto=format&fit=crop&q=80'
-        });
+    <!-- PANEL DE ADMINISTRACIÓN / GESTOR DE RADIOS -->
+    <div id="adminDashboardModal" class="admin-modal hidden">
+        <div class="admin-dashboard-container">
+            <div class="dashboard-top-bar">
+                <h3><i class="fa-solid fa-sliders"></i> Panel de Gestión de Radios</h3>
+                <button id="closeDashboardBtn" class="close-dash-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
 
-        localStorage.setItem(CATALOG_VERSION, JSON.stringify(stations));
-        activeStationIndex = stations.length - 1;
-        
-        inputStationName.value = '';
-        inputStationGenre.value = '';
-        inputStreamUrl.value = '';
-        inputStationLogo.value = '';
+            <div class="github-export-banner">
+                <div class="github-export-info">
+                    <i class="fa-solid fa-download"></i>
+                    <div>
+                        <strong>Guardar para GitHub</strong>
+                        <p>Descarga el index.html listo para subir.</p>
+                    </div>
+                </div>
+                <button id="downloadIndexBtn" class="btn-download-gh">
+                    <i class="fa-solid fa-code"></i> Descargar
+                </button>
+            </div>
 
-        renderCatalog();
-        updateActiveStation();
-        renderAdminList();
-        alert('¡Radio agregada con éxito!');
-    });
+            <div class="dashboard-grid-split">
+                <div class="add-station-form-card">
+                    <h4><i class="fa-solid fa-plus-circle"></i> Nueva Radio</h4>
+                    <div class="form-group">
+                        <label>Nombre</label>
+                        <input type="text" id="inputStationName" placeholder="Ej: Tropicana">
+                    </div>
+                    <div class="form-group">
+                        <label>País / Nacionalidad</label>
+                        <input type="text" id="inputStationCategory" list="countriesList" placeholder="Ej: Colombia, México, España...">
+                        <datalist id="countriesList">
+                            <option value="Colombia">
+                            <option value="República Dominicana">
+                            <option value="México">
+                            <option value="Estados Unidos">
+                            <option value="España">
+                            <option value="Argentina">
+                            <option value="Venezuela">
+                            <option value="Internacional">
+                        </datalist>
+                    </div>
+                    <div class="form-group">
+                        <label>Género Musical</label>
+                        <input type="text" id="inputStationGenre" placeholder="Ej: Salsa / Pop">
+                    </div>
+                    <div class="form-group">
+                        <label>Enlace Stream (HTTPS)</label>
+                        <input type="url" id="inputStreamUrl" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label>Portada URL</label>
+                        <input type="url" id="inputStationLogo" placeholder="https://...">
+                    </div>
+                    <button id="addStationBtn" class="btn-primary full-btn">Agregar Radio</button>
+                </div>
 
-    playPauseBtn.addEventListener('click', () => {
-        if (!isPlaying && !isConnecting) {
-            startPlayback();
-        } else {
-            stopPlayback();
-        }
-    });
+                <div class="configure-stations-card">
+                    <h4><i class="fa-solid fa-pen-to-square"></i> Configurar Enlaces y Portadas</h4>
+                    <div id="adminStationsList" class="admin-stations-scroll">
+                        <!-- Dinámico -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    nextBtn.addEventListener('click', () => {
-        if (stations.length === 0) return;
-        activeStationIndex = (activeStationIndex + 1) % stations.length;
-        updateActiveStation();
-        startPlayback();
-    });
-
-    prevBtn.addEventListener('click', () => {
-        if (stations.length === 0) return;
-        activeStationIndex = (activeStationIndex - 1 + stations.length) % stations.length;
-        updateActiveStation();
-        startPlayback();
-    });
-
-    // Se activa únicamente cuando el audio empieza a sonar de verdad
-    audioStream.addEventListener('playing', () => {
-        isConnecting = false;
-        isPlaying = true;
-        playIcon.className = 'fa-solid fa-pause';
-        stationCoverFrame.classList.add('playing');
-        statusText.textContent = 'En Sintonía';
-        serverStatusIndicator.style.borderColor = '#22c55e';
-        liveBadgeIndicator.classList.add('active');
-        
-        initAudioVisualizer();
-        if (audioCtx && audioCtx.state === 'suspended') {
-            audioCtx.resume();
-        }
-    });
-
-    // Si la red se entrecorta y vuelve a cargar búfer, muestra el aviso de nuevo
-    audioStream.addEventListener('waiting', () => {
-        if (!audioStream.paused) {
-            isConnecting = true;
-            isPlaying = false;
-            statusText.textContent = 'Conectando...';
-            liveBadgeIndicator.classList.remove('active');
-        }
-    });
-
-    function startPlayback() {
-        const station = stations[activeStationIndex];
-        if (!station) return;
-
-        isConnecting = true;
-        isPlaying = false;
-        playIcon.className = 'fa-solid fa-pause';
-        statusText.textContent = 'Conectando...';
-        stationCoverFrame.classList.remove('playing');
-        liveBadgeIndicator.classList.remove('active');
-
-        audioStream.src = station.url;
-
-        audioStream.play().catch(err => {
-            console.error("Error al reproducir:", err);
-            isConnecting = false;
-            isPlaying = false;
-            statusText.textContent = 'Error de stream';
-            serverStatusIndicator.style.borderColor = '#ef4444';
-            playIcon.className = 'fa-solid fa-play';
-            stationCoverFrame.classList.remove('playing');
-            liveBadgeIndicator.classList.remove('active');
-        });
-    }
-
-    function stopPlayback() {
-        audioStream.pause();
-        audioStream.src = '';
-        isConnecting = false;
-        isPlaying = false;
-        playIcon.className = 'fa-solid fa-play';
-        stationCoverFrame.classList.remove('playing');
-        statusText.textContent = 'Detenido';
-        liveBadgeIndicator.classList.remove('active');
-    }
-
-    volumeSlider.addEventListener('input', (e) => {
-        audioStream.volume = e.target.value;
-    });
-
-    renderCatalog();
-    updateActiveStation();
-
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').catch(() => {});
-    }
-});
+    <!-- Audio Oculto (sin crossorigin para permitir streams externos) -->
+    <audio id="audioStream" preload="none"></audio>
+    <script src="app.js"></script>
+</body>
+</html>
