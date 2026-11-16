@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const installAppBtn = document.getElementById('installAppBtn');
 
     // VERSIÓN DEL CATÁLOGO: Sube este número (v15, v16...) cada vez que edites las emisoras aquí
-    const CATALOG_VERSION = 'sol_stations_v16';
+    const CATALOG_VERSION = 'sol_stations_v17';
 
     // Limpia versiones anteriores del almacenamiento local
     Object.keys(localStorage).forEach(key => {
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
             name: "Olímpica Estéreo Barranquilla", 
             category: "colombia", 
             genre: "General",
-            url: "https://playerservices.streamtheworld.com/api/livestream-redirect/OLIMPICA_BAQ.aac", 
+            url: "https://playerservices.streamtheworld.com/api/livestream-redirect/OLP_BARRANQUILLA_SC", 
             logo: "https://static.mytuner.mobi/media/tvos_radios/913/olimpica-stereo-barranquilla-921-fm.a7f8c4c5.png" 
         },
         { 
