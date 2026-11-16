@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const installAppBtn = document.getElementById('installAppBtn');
 
     // VERSIÓN DEL CATÁLOGO: Sube este número (v15, v16...) cada vez que edites las emisoras aquí
-    const CATALOG_VERSION = 'sol_stations_v17';
+    const CATALOG_VERSION = 'sol_stations_v18';
 
     // Limpia versiones anteriores del almacenamiento local
     Object.keys(localStorage).forEach(key => {
@@ -83,6 +83,13 @@ document.addEventListener('DOMContentLoaded', () => {
             genre: "General",
             url: "https://playerservices.streamtheworld.com/api/livestream-redirect/LA_KALLE.mp3", 
             logo: "https://thumbnail.anii.io/co/120f8533-a122-11ef-8b9a-60ad4349a14f.webp" 
+        },
+        { 
+            name: "Radio Disney Costa Rica", 
+            category: "costa rica", 
+            genre: "General",
+            url: "https://playerservices.streamtheworld.com/api/livestream-redirect/DISNEY_CRI_SJ_ADP.m3u8", 
+            logo: "https://radioarg.net/storage/radios/19431/84085/conversions/vPeIqefHtuHw8tsmchYt20FxZpimiL-metaZGlzbmV5LWNvc3RhLXJpY2Eud2VicA==--lg.webp" 
         },
         { 
             name: "Himnos Cristianos Del Ayer", 
