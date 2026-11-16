@@ -44,8 +44,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const instrPanes = document.querySelectorAll('.device-instr-pane');
     const installAppBtn = document.getElementById('installAppBtn');
 
-    // Catálogo de Emisoras
-    let stations = JSON.parse(localStorage.getItem('sol_stations_v11')) || [
+    // VERSIÓN DEL CATÁLOGO: Sube este número (v12, v13...) cada vez que edites las emisoras aquí en el código
+    const CATALOG_VERSION = 'sol_stations_v12';
+
+    // Limpia versiones anteriores del almacenamiento local para evitar conflictos
+    Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('sol_stations_') && key !== CATALOG_VERSION) {
+            localStorage.removeItem(key);
+        }
+    });
+
+    // Catálogo Oficial de Emisoras
+    let stations = JSON.parse(localStorage.getItem(CATALOG_VERSION)) || [
         { 
             name: "Olímpica Estéreo Barranquilla", 
             category: "colombia", 
@@ -83,8 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     ];
 
-
-   let activeStationIndex = 0;
+    let activeStationIndex = 0;
     let currentFilter = 'all';
     let isPlaying = false;
     let isConnecting = false;
@@ -167,7 +176,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 x += barWidth + 2;
             }
         } else if (isConnecting) {
-            // Aviso pulsante mientras el stream llena el búfer
             const pulse = (Math.sin(Date.now() / 220) + 1) / 2;
             
             canvasCtx.fillStyle = `rgba(56, 189, 248, ${0.12 + pulse * 0.2})`;
@@ -268,7 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (shareAppBtn) shareAppBtn.addEventListener('click', triggerShare);
     if (shareAppBtnInternal) shareAppBtnInternal.addEventListener('click', triggerShare);
 
-    // --- GESTIÓN DE EMISORAS Y CATALOGO ---
+    // --- GESTIÓN DE EMISORAS Y CATÁLOGO ---
     function renderCatalog() {
         stationsCatalogGrid.innerHTML = '';
         stations.forEach((station, index) => {
@@ -326,6 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <select class="styled-select edit-cat" data-index="${index}">
                             <option value="colombia" ${station.category === 'colombia' ? 'selected' : ''}>Colombia</option>
                             <option value="alemania" ${station.category === 'alemania' ? 'selected' : ''}>Alemania</option>
+                            <option value="republica dominicana" ${station.category === 'republica dominicana' ? 'selected' : ''}>República Dominicana</option>
                             <option value="internacional" ${station.category === 'internacional' ? 'selected' : ''}>Internacional</option>
                         </select>
                     </div>
@@ -356,7 +365,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 stations[idx].url = adminStationsList.querySelector(`.edit-url[data-index="${idx}"]`).value;
                 stations[idx].logo = adminStationsList.querySelector(`.edit-logo[data-index="${idx}"]`).value;
 
-                localStorage.setItem('sol_stations_v9', JSON.stringify(stations));
+                localStorage.setItem(CATALOG_VERSION, JSON.stringify(stations));
                 renderCatalog();
                 updateActiveStation();
                 alert('¡Radio actualizada con éxito!');
@@ -368,7 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const idx = e.currentTarget.getAttribute('data-index');
                 if (confirm(`¿Eliminar la radio "${stations[idx].name}"?`)) {
                     stations.splice(idx, 1);
-                    localStorage.setItem('sol_stations_v9', JSON.stringify(stations));
+                    localStorage.setItem(CATALOG_VERSION, JSON.stringify(stations));
                     renderCatalog();
                     updateActiveStation();
                     renderAdminList();
@@ -449,7 +458,7 @@ document.addEventListener('DOMContentLoaded', () => {
             logo: logo || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&auto=format&fit=crop&q=80'
         });
 
-        localStorage.setItem('sol_stations_v9', JSON.stringify(stations));
+        localStorage.setItem(CATALOG_VERSION, JSON.stringify(stations));
         activeStationIndex = stations.length - 1;
         
         inputStationName.value = '';
@@ -522,7 +531,6 @@ document.addEventListener('DOMContentLoaded', () => {
         stationCoverFrame.classList.remove('playing');
         liveBadgeIndicator.classList.remove('active');
 
-        // audioStream.crossOrigin = "anonymous";
         audioStream.src = station.url;
 
         audioStream.play().catch(err => {
