@@ -219,4 +219,423 @@ document.addEventListener('DOMContentLoaded', () => {
             let hasRealData = false;
             if (analyser) {
                 try {
-                    analyser.getByteFrequencyData(freq
+                    analyser.getByteFrequencyData(freqData);
+                    hasRealData = freqData.some(val => val > 0);
+                } catch (err) {
+                    hasRealData = false;
+                }
+            }
+
+            if (!hasRealData) {
+                for (let i = 0; i < freqData.length; i++) {
+                    let wave = Math.sin(Date.now() / 120 + (i * 0.4)) * 110 + 70;
+                    let noise = Math.random() * 50;
+                    freqData[i] = Math.min(255, Math.abs(wave + noise));
+                }
+            }
+
+            const barWidth = (width / freqData.length) * 1.8;
+            let x = 0;
+
+            for (let i = 0; i < freqData.length; i++) {
+                const barHeight = (freqData[i] / 255) * height * 0.95;
+                
+                let gradient = canvasCtx.createLinearGradient(0, height, 0, 0);
+                gradient.addColorStop(0, '#FCD116');
+                gradient.addColorStop(0.5, '#38bdf8');
+                gradient.addColorStop(1, '#a855f7');
+
+                canvasCtx.fillStyle = gradient;
+                canvasCtx.shadowBlur = 12;
+                canvasCtx.shadowColor = '#FCD116';
+                canvasCtx.fillRect(x, height - barHeight, barWidth - 2, barHeight);
+
+                x += barWidth + 2;
+            }
+        } else if (isConnecting) {
+            const pulse = (Math.sin(Date.now() / 220) + 1) / 2;
+            
+            canvasCtx.fillStyle = `rgba(56, 189, 248, ${0.12 + pulse * 0.2})`;
+            canvasCtx.shadowBlur = 0;
+            canvasCtx.fillRect(0, height / 2 - 1, width, 2);
+
+            canvasCtx.font = "600 13px 'Poppins', sans-serif";
+            canvasCtx.fillStyle = `rgba(252, 209, 22, ${0.65 + pulse * 0.35})`;
+            canvasCtx.textAlign = "center";
+            canvasCtx.textBaseline = "middle";
+            canvasCtx.shadowBlur = 8;
+            canvasCtx.shadowColor = "rgba(252, 209, 22, 0.35)";
+            canvasCtx.fillText("Estableciendo conexión...", width / 2, height / 2);
+        } else {
+            canvasCtx.fillStyle = '#2a3b5c';
+            canvasCtx.shadowBlur = 0;
+            canvasCtx.fillRect(0, height / 2 - 1, width, 2);
+        }
+        requestAnimationFrame(drawVisualizer);
+    }
+
+    if (canvas) {
+        drawVisualizer();
+    }
+
+    // --- LÓGICA DE INSTALACIÓN PWA ---
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        if (installAppBtn) installAppBtn.classList.remove('hidden');
+    });
+
+    if (installAppBtn) {
+        installAppBtn.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                installAppBtn.classList.add('hidden');
+            }
+            deferredPrompt = null;
+        });
+    }
+
+    window.addEventListener('appinstalled', () => {
+        if (installAppBtn) installAppBtn.classList.add('hidden');
+    });
+
+    // --- LÓGICA DEL CENTRO DE AYUDA ---
+    if (openHelpModalBtn) {
+        openHelpModalBtn.addEventListener('click', () => {
+            if (helpDashboardModal) {
+                helpDashboardModal.classList.remove('hidden');
+                switchDeviceTab('iphone');
+            }
+        });
+    }
+
+    if (closeHelpDashBtn) {
+        closeHelpDashBtn.addEventListener('click', () => {
+            if (helpDashboardModal) helpDashboardModal.classList.add('hidden');
+        });
+    }
+
+    function switchDeviceTab(device) {
+        deviceTabs.forEach(t => t.classList.remove('active'));
+        instrPanes.forEach(p => p.classList.remove('active'));
+        
+        const selectedTab = document.querySelector(`.device-tab[data-device="${device}"]`);
+        const selectedPane = document.getElementById(`instr-${device}`);
+        
+        if (selectedTab) selectedTab.classList.add('active');
+        if (selectedPane) selectedPane.classList.add('active');
+    }
+
+    deviceTabs.forEach(tab => {
+        tab.addEventListener('click', (e) => {
+            const device = e.currentTarget.getAttribute('data-device');
+            switchDeviceTab(device);
+        });
+    });
+
+    // --- COMPARTIR APP ---
+    function triggerShare() {
+        if (navigator.share) {
+            navigator.share({
+                title: 'Sol Digital Radio',
+                text: '¡Escucha las mejores emisoras en Sol Digital Radio!',
+                url: window.location.href
+            }).catch(() => {});
+        } else {
+            navigator.clipboard.writeText(window.location.href);
+            alert('¡Enlace copiado al portapapeles!');
+        }
+    }
+
+    if (shareAppBtn) shareAppBtn.addEventListener('click', triggerShare);
+    if (shareAppBtnInternal) shareAppBtnInternal.addEventListener('click', triggerShare);
+
+    // --- GESTIÓN DE EMISORAS Y CATÁLOGO ---
+    function renderCatalog() {
+        stationsCatalogGrid.innerHTML = '';
+        stations.forEach((station, index) => {
+            const stationCat = (station.category || 'colombia').trim().toLowerCase();
+            if (currentFilter !== 'all' && stationCat !== currentFilter) return;
+
+            const card = document.createElement('div');
+            card.className = `station-card-item ${index === activeStationIndex ? 'active' : ''}`;
+            card.innerHTML = `
+                <div class="station-card-thumb">
+                    <img src="${station.logo || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&auto=format&fit=crop&q=80'}" alt="${station.name}">
+                </div>
+                <div class="station-card-title">${station.name}</div>
+                <div class="station-card-genre">${station.genre || 'General'}</div>
+            `;
+
+            card.addEventListener('click', () => {
+                activeStationIndex = index;
+                updateActiveStation();
+                startPlayback();
+            });
+
+            stationsCatalogGrid.appendChild(card);
+        });
+    }
+
+    function updateActiveStation() {
+        const station = stations[activeStationIndex];
+        if (!station) return;
+
+        currentTrackTitle.textContent = station.name;
+        currentTrackCategory.textContent = `Nacionalidad: ${(station.category || 'Colombia').toUpperCase()}`;
+        currentGenreBadge.textContent = station.genre || 'General';
+        stationLogoImg.src = station.logo || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&auto=format&fit=crop&q=80';
+        
+        renderCatalog();
+    }
+
+    function renderAdminList() {
+        adminStationsList.innerHTML = '';
+        stations.forEach((station, index) => {
+            const row = document.createElement('div');
+            row.className = 'admin-station-row';
+            row.innerHTML = `
+                <div class="admin-station-row-top">
+                    <span class="admin-station-name">ID: ${index + 1} - ${station.name}</span>
+                    <button class="btn-danger delete-btn" data-index="${index}"><i class="fa-solid fa-trash"></i></button>
+                </div>
+                <div class="form-group" style="margin-bottom:4px;">
+                    <label>Nombre</label>
+                    <input type="text" class="edit-name" data-index="${index}" value="${station.name}">
+                </div>
+                <div class="admin-station-inputs">
+                    <div class="form-group" style="margin-bottom:4px;">
+                        <label>País / Nacionalidad</label>
+                        <input type="text" class="edit-cat" list="countriesList" data-index="${index}" value="${station.category || ''}">
+                    </div>
+                    <div class="form-group" style="margin-bottom:4px;">
+                        <label>Género</label>
+                        <input type="text" class="edit-genre" data-index="${index}" value="${station.genre || ''}">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom:4px;">
+                    <label>Enlace Stream URL</label>
+                    <input type="url" class="edit-url" data-index="${index}" value="${station.url}">
+                </div>
+                <div class="form-group" style="margin-bottom:4px;">
+                    <label>Portada URL</label>
+                    <input type="url" class="edit-logo" data-index="${index}" value="${station.logo || ''}">
+                </div>
+                <button class="btn-primary save-station-btn" data-index="${index}"><i class="fa-solid fa-floppy-disk"></i> Guardar</button>
+            `;
+            adminStationsList.appendChild(row);
+        });
+
+        adminStationsList.querySelectorAll('.save-station-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const idx = e.currentTarget.getAttribute('data-index');
+                stations[idx].name = adminStationsList.querySelector(`.edit-name[data-index="${idx}"]`).value.trim();
+                stations[idx].category = adminStationsList.querySelector(`.edit-cat[data-index="${idx}"]`).value.trim().toLowerCase() || 'colombia';
+                stations[idx].genre = adminStationsList.querySelector(`.edit-genre[data-index="${idx}"]`).value.trim();
+                stations[idx].url = adminStationsList.querySelector(`.edit-url[data-index="${idx}"]`).value.trim();
+                stations[idx].logo = adminStationsList.querySelector(`.edit-logo[data-index="${idx}"]`).value.trim();
+
+                localStorage.setItem(CATALOG_VERSION, JSON.stringify(stations));
+                renderTabs();
+                renderCatalog();
+                updateActiveStation();
+                alert('¡Radio actualizada con éxito!');
+            });
+        });
+
+        adminStationsList.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const idx = e.currentTarget.getAttribute('data-index');
+                if (confirm(`¿Eliminar la radio "${stations[idx].name}"?`)) {
+                    stations.splice(idx, 1);
+                    if (activeStationIndex >= stations.length) {
+                        activeStationIndex = Math.max(0, stations.length - 1);
+                    }
+                    localStorage.setItem(CATALOG_VERSION, JSON.stringify(stations));
+                    renderTabs();
+                    renderCatalog();
+                    updateActiveStation();
+                    renderAdminList();
+                }
+            });
+        });
+    }
+
+    openAdminModalBtn.addEventListener('click', () => {
+        adminPasswordInput.value = '';
+        adminPasswordModal.classList.remove('hidden');
+    });
+
+    cancelPasswordBtn.addEventListener('click', () => {
+        adminPasswordModal.classList.add('hidden');
+    });
+
+    submitPasswordBtn.addEventListener('click', () => {
+        if (adminPasswordInput.value === 'Solradio2026.') {
+            adminPasswordModal.classList.add('hidden');
+            renderAdminList();
+            adminDashboardModal.classList.remove('hidden');
+        } else {
+            alert('Contraseña incorrecta.');
+        }
+    });
+
+    closeDashboardBtn.addEventListener('click', () => {
+        adminDashboardModal.classList.add('hidden');
+    });
+
+    downloadIndexBtn.addEventListener('click', () => {
+        adminDashboardModal.classList.add('hidden');
+        adminPasswordModal.classList.add('hidden');
+        adminStationsList.innerHTML = ''; 
+
+        const htmlContent = document.documentElement.outerHTML;
+        renderAdminList();
+
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'index.html';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        alert('¡Archivo index.html descargado limpio y listo para GitHub!');
+    });
+
+    addStationBtn.addEventListener('click', () => {
+        const name = inputStationName.value.trim();
+        const category = inputStationCategory.value.trim().toLowerCase() || 'colombia';
+        const genre = inputStationGenre.value.trim();
+        const url = inputStreamUrl.value.trim();
+        const logo = inputStationLogo.value.trim();
+
+        if (!name || !url) {
+            alert('Por favor completa al menos el nombre y la URL del stream.');
+            return;
+        }
+
+        stations.push({
+            name,
+            category,
+            genre: genre || 'General',
+            url,
+            logo: logo || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&auto=format&fit=crop&q=80'
+        });
+
+        localStorage.setItem(CATALOG_VERSION, JSON.stringify(stations));
+        activeStationIndex = stations.length - 1;
+        
+        inputStationName.value = '';
+        inputStationCategory.value = '';
+        inputStationGenre.value = '';
+        inputStreamUrl.value = '';
+        inputStationLogo.value = '';
+
+        renderTabs();
+        renderCatalog();
+        updateActiveStation();
+        renderAdminList();
+        alert('¡Radio agregada con éxito!');
+    });
+
+    playPauseBtn.addEventListener('click', () => {
+        if (!isPlaying && !isConnecting) {
+            startPlayback();
+        } else {
+            stopPlayback();
+        }
+    });
+
+    nextBtn.addEventListener('click', () => {
+        if (stations.length === 0) return;
+        activeStationIndex = (activeStationIndex + 1) % stations.length;
+        updateActiveStation();
+        startPlayback();
+    });
+
+    prevBtn.addEventListener('click', () => {
+        if (stations.length === 0) return;
+        activeStationIndex = (activeStationIndex - 1 + stations.length) % stations.length;
+        updateActiveStation();
+        startPlayback();
+    });
+
+    // Se activa únicamente cuando el audio empieza a sonar de verdad
+    audioStream.addEventListener('playing', () => {
+        isConnecting = false;
+        isPlaying = true;
+        playIcon.className = 'fa-solid fa-pause';
+        stationCoverFrame.classList.add('playing');
+        statusText.textContent = 'En Sintonía';
+        serverStatusIndicator.style.borderColor = '#22c55e';
+        liveBadgeIndicator.classList.add('active');
+        
+        initAudioVisualizer();
+        if (audioCtx && audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    });
+
+    // Si la red se entrecorta y vuelve a cargar búfer, muestra el aviso de nuevo
+    audioStream.addEventListener('waiting', () => {
+        if (!audioStream.paused) {
+            isConnecting = true;
+            isPlaying = false;
+            statusText.textContent = 'Conectando...';
+            liveBadgeIndicator.classList.remove('active');
+        }
+    });
+
+    function startPlayback() {
+        const station = stations[activeStationIndex];
+        if (!station) return;
+
+        isConnecting = true;
+        isPlaying = false;
+        playIcon.className = 'fa-solid fa-pause';
+        statusText.textContent = 'Conectando...';
+        stationCoverFrame.classList.remove('playing');
+        liveBadgeIndicator.classList.remove('active');
+
+        audioStream.src = station.url;
+
+        audioStream.play().catch(err => {
+            console.error("Error al reproducir:", err);
+            isConnecting = false;
+            isPlaying = false;
+            statusText.textContent = 'Error de stream';
+            serverStatusIndicator.style.borderColor = '#ef4444';
+            playIcon.className = 'fa-solid fa-play';
+            stationCoverFrame.classList.remove('playing');
+            liveBadgeIndicator.classList.remove('active');
+        });
+    }
+
+    function stopPlayback() {
+        audioStream.pause();
+        audioStream.src = '';
+        isConnecting = false;
+        isPlaying = false;
+        playIcon.className = 'fa-solid fa-play';
+        stationCoverFrame.classList.remove('playing');
+        statusText.textContent = 'Detenido';
+        liveBadgeIndicator.classList.remove('active');
+    }
+
+    volumeSlider.addEventListener('input', (e) => {
+        audioStream.volume = e.target.value;
+    });
+
+    renderTabs();
+    renderCatalog();
+    updateActiveStation();
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
+});
