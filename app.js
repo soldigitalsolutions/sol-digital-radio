@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const installAppBtn = document.getElementById('installAppBtn');
 
     // Catálogo de Emisoras
-    let stations = JSON.parse(localStorage.getItem('sol_stations_v10')) || [
+    let stations = JSON.parse(localStorage.getItem('sol_stations_v11')) || [
         { 
             name: "Olímpica Estéreo Barranquilla", 
             category: "colombia", 
@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
             name: "La Kalle 96.9", 
             category: "colombia", 
             genre: "General",
-            url: "http://playerservices.streamtheworld.com/m3u/LA_KALLE.m3u", 
+            url: "https://playerservices.streamtheworld.com/api/livestream-redirect/LA_KALLE.mp3", 
             logo: "https://thumbnail.anii.io/co/120f8533-a122-11ef-8b9a-60ad4349a14f.webp" 
         },
         { 
@@ -84,9 +84,10 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
 
-    let activeStationIndex = 0;
+   let activeStationIndex = 0;
     let currentFilter = 'all';
     let isPlaying = false;
+    let isConnecting = false;
 
     // --- VISUALIZADOR DE AUDIO (HÍBRIDO INTELIGENTE EN VIVO) ---
     let audioCtx = null;
@@ -165,6 +166,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 x += barWidth + 2;
             }
+        } else if (isConnecting) {
+            // Aviso pulsante mientras el stream llena el búfer
+            const pulse = (Math.sin(Date.now() / 220) + 1) / 2;
+            
+            canvasCtx.fillStyle = `rgba(56, 189, 248, ${0.12 + pulse * 0.2})`;
+            canvasCtx.shadowBlur = 0;
+            canvasCtx.fillRect(0, height / 2 - 1, width, 2);
+
+            canvasCtx.font = "600 13px 'Poppins', sans-serif";
+            canvasCtx.fillStyle = `rgba(252, 209, 22, ${0.65 + pulse * 0.35})`;
+            canvasCtx.textAlign = "center";
+            canvasCtx.textBaseline = "middle";
+            canvasCtx.shadowBlur = 8;
+            canvasCtx.shadowColor = "rgba(252, 209, 22, 0.35)";
+            canvasCtx.fillText("Estableciendo conexión...", width / 2, height / 2);
         } else {
             canvasCtx.fillStyle = '#2a3b5c';
             canvasCtx.shadowBlur = 0;
@@ -448,7 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     playPauseBtn.addEventListener('click', () => {
-        if (!isPlaying) {
+        if (!isPlaying && !isConnecting) {
             startPlayback();
         } else {
             stopPlayback();
@@ -469,31 +485,52 @@ document.addEventListener('DOMContentLoaded', () => {
         startPlayback();
     });
 
+    // Se activa únicamente cuando el audio empieza a sonar de verdad
+    audioStream.addEventListener('playing', () => {
+        isConnecting = false;
+        isPlaying = true;
+        playIcon.className = 'fa-solid fa-pause';
+        stationCoverFrame.classList.add('playing');
+        statusText.textContent = 'En Sintonía';
+        serverStatusIndicator.style.borderColor = '#22c55e';
+        liveBadgeIndicator.classList.add('active');
+        
+        initAudioVisualizer();
+        if (audioCtx && audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    });
+
+    // Si la red se entrecorta y vuelve a cargar búfer, muestra el aviso de nuevo
+    audioStream.addEventListener('waiting', () => {
+        if (!audioStream.paused) {
+            isConnecting = true;
+            isPlaying = false;
+            statusText.textContent = 'Conectando...';
+            liveBadgeIndicator.classList.remove('active');
+        }
+    });
+
     function startPlayback() {
         const station = stations[activeStationIndex];
         if (!station) return;
 
-        audioStream.crossOrigin = "anonymous";
-        audioStream.src = station.url;
+        isConnecting = true;
+        isPlaying = false;
+        playIcon.className = 'fa-solid fa-pause';
         statusText.textContent = 'Conectando...';
+        stationCoverFrame.classList.remove('playing');
+        liveBadgeIndicator.classList.remove('active');
 
-        audioStream.play().then(() => {
-            isPlaying = true;
-            playIcon.className = 'fa-solid fa-pause';
-            stationCoverFrame.classList.add('playing');
-            statusText.textContent = 'En Sintonía';
-            serverStatusIndicator.style.borderColor = '#22c55e';
-            liveBadgeIndicator.classList.add('active');
-            
-            initAudioVisualizer();
-            if (audioCtx && audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-        }).catch(err => {
+        // audioStream.crossOrigin = "anonymous";
+        audioStream.src = station.url;
+
+        audioStream.play().catch(err => {
             console.error("Error al reproducir:", err);
+            isConnecting = false;
+            isPlaying = false;
             statusText.textContent = 'Error de stream';
             serverStatusIndicator.style.borderColor = '#ef4444';
-            isPlaying = false;
             playIcon.className = 'fa-solid fa-play';
             stationCoverFrame.classList.remove('playing');
             liveBadgeIndicator.classList.remove('active');
@@ -503,6 +540,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function stopPlayback() {
         audioStream.pause();
         audioStream.src = '';
+        isConnecting = false;
         isPlaying = false;
         playIcon.className = 'fa-solid fa-play';
         stationCoverFrame.classList.remove('playing');
